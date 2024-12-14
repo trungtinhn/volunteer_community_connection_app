@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String API_URL = 'https://e606-42-112-244-29.ngrok-free.app/api';
+  static const String API_URL = 'https://39a6-42-112-244-29.ngrok-free.app/api';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(
@@ -40,6 +40,23 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('GET error: $e');
+    }
+  }
+
+  // Hàm GET tất cả
+  Future<List<dynamic>> getAll(String endpoint) async {
+    final url = Uri.parse('$API_URL$endpoint');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as List<dynamic>;
+      } else {
+        throw Exception(
+            'Failed GET ALL request: ${response.statusCode}, ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('GET ALL error: $e');
     }
   }
 
