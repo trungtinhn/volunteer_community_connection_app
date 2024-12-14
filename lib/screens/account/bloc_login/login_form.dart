@@ -7,6 +7,7 @@ import 'package:volunteer_community_connection_app/components/button_icon.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
 import 'package:volunteer_community_connection_app/screens/account/sign_up_screen.dart';
 import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
 
@@ -30,8 +31,30 @@ class _LoginFormState extends State<LoginForm> {
   final Authcontroller authController = Get.put(Authcontroller());
 
   @override
+
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginState>(
+/*************  ✨ Codeium Command ⭐  *************/
+  /// Builds the login form based on the current state of the [LoginBloc].
+  ///
+  /// The form consists of a header with a background image, a username text
+  /// field, a password text field, a remember me checkbox, a forgot password
+  /// button, a login button, and a sign up link. The form is wrapped in a
+  /// [SingleChildScrollView] to make it scrollable.
+  ///
+  /// The username and password fields are validated using the [LoginBloc]'s
+  /// [LoginEvent]s. When the user presses the login button, the [LoginBloc] is
+  /// notified and it will validate the fields and perform the login if they are
+  /// valid. If the login is successful, the user is navigated to the home
+  /// screen. If the login fails, an error message is shown to the user.
+  ///
+  /// The form also includes a divider with an "Or login with" text and social
+  /// login buttons (Facebook, Google, Apple). The social login buttons are
+  /// currently not functional.
+  ///
+  /// The form is wrapped in a [BlocListener] to listen to the [LoginBloc]'s
+  /// [LoginState] and show a loading indicator when the state is [LoginLoading],
+  /// and to show an error message when the state is [LoginFailure].
+/******  c14ee8b6-fb63-4338-96f6-b0ac1b2c6513  *******/    return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state is LoginFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -190,14 +213,9 @@ class _LoginFormState extends State<LoginForm> {
                           onPress: () async {
                             final email = _usernameController.text;
                             final password = _passwordController.text;
-                            // context.read<LoginBloc>().add(
-                            //       LoginSubmitted(
-                            //           email: email, password: password),
-                            //     );
 
                             bool isLogin =
                                 await authController.login(email, password);
-
                             if (isLogin) {
                               Navigator.push(
                                 context,
