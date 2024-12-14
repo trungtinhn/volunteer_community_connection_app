@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/components/button_icon.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
 import 'package:volunteer_community_connection_app/screens/account/sign_up_screen.dart';
 import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
 
@@ -24,6 +26,8 @@ class _LoginFormState extends State<LoginForm> {
   bool _isLoading = false;
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  final Authcontroller authController = Get.put(Authcontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -183,19 +187,32 @@ class _LoginFormState extends State<LoginForm> {
                         // Login Button
                         ButtonBlue(
                           isLoading: _isLoading,
-                          onPress: () {
+                          onPress: () async {
                             final email = _usernameController.text;
                             final password = _passwordController.text;
                             // context.read<LoginBloc>().add(
                             //       LoginSubmitted(
                             //           email: email, password: password),
                             //     );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const BottomNavigation(),
-                              ),
-                            );
+
+                            bool isLogin =
+                                await authController.login(email, password);
+
+                            if (isLogin) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const BottomNavigation(),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Login failed'),
+                                ),
+                              );
+                            }
                           },
                           des: 'Login',
                         ),
