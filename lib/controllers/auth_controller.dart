@@ -11,14 +11,19 @@ class Authcontroller extends GetxController {
   final RxBool _isLoggedIn = false.obs;
   final AuthRepository _authRepository = AuthRepository();
   Future<bool> login(String email, String password) async {
-    final SharedPreferences prefs = await _prefs;
-    final String? token = await _authRepository.login(email, password);
-    if (token != null) {
-      await prefs.setString('token', token);
-      _isLoggedIn.value = true;
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = await _authRepository.login(email, password);
+      if (token != null) {
+        await prefs.setString('token', token);
+        _isLoggedIn.value = true;
 
-      return true;
+        return true;
+      }
+    } catch (e) {
+      return false;
     }
+
     return false;
   }
 }

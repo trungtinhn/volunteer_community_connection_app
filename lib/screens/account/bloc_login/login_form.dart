@@ -7,6 +7,8 @@ import 'package:volunteer_community_connection_app/components/button_icon.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/screens/account/sign_up_screen.dart';
 import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
 
@@ -28,9 +30,19 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
 
   final Authcontroller authController = Get.put(Authcontroller());
+  final Usercontroller usercontroller = Get.put(Usercontroller());
 
   @override
   Widget build(BuildContext context) {
+    void _showSnackBar() {
+      const snackBar = SnackBar(
+        content: Text('Đăng nhập không thành công!'),
+      );
+
+      // Hiển thị SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state is LoginFailure) {
@@ -199,6 +211,11 @@ class _LoginFormState extends State<LoginForm> {
                                 await authController.login(email, password);
 
                             if (isLogin) {
+                              User? user =
+                                  await usercontroller.getUserByEmail(email);
+
+                              usercontroller.setCurrentUser(user);
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -207,11 +224,7 @@ class _LoginFormState extends State<LoginForm> {
                                 ),
                               );
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Login failed'),
-                                ),
-                              );
+                              _showSnackBar();
                             }
                           },
                           des: 'Login',

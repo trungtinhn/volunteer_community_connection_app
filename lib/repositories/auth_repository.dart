@@ -5,7 +5,7 @@ class AuthRepository {
 
   Future<String?> login(String email, String password) async {
     final data = await _apiService
-        .post('/Auth/login', {'email': email, 'password': password});
+        .post('/api/Auth/login', {'email': email, 'password': password});
 
     final token = data['token'];
     return token;

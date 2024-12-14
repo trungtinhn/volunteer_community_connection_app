@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:volunteer_community_connection_app/components/chat_item.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/chat/detail_chat_screen.dart';
+import 'package:volunteer_community_connection_app/services/chat_service.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,6 +17,25 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final ChatService _chatService = ChatService();
+
+  final Usercontroller _userController = Get.put(Usercontroller());
+
+  Future<void> _initChatService() async {
+    await _chatService.initConnection(_userController.getCurrentUser()!.userId);
+
+    _chatService.hubConnection.on('ReceiveMessage', (arguments) {
+      print(
+          'Message received: SenderId=${arguments?[0]}, Content=${arguments?[1]}, SentAt=${arguments?[2]}');
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initChatService();
+  }
+
   final List<Map<String, dynamic>> chatData = [
     {
       "name": "Bryan",
