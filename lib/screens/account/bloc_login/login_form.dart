@@ -9,6 +9,7 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/models/user.dart';
+
 import 'package:volunteer_community_connection_app/screens/account/sign_up_screen.dart';
 import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
 
@@ -33,6 +34,7 @@ class _LoginFormState extends State<LoginForm> {
   final Usercontroller usercontroller = Get.put(Usercontroller());
 
   @override
+
   Widget build(BuildContext context) {
     void _showSnackBar() {
       const snackBar = SnackBar(
@@ -44,6 +46,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     return BlocListener<LoginBloc, LoginState>(
+
       listener: (context, state) {
         if (state is LoginFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -202,14 +205,9 @@ class _LoginFormState extends State<LoginForm> {
                           onPress: () async {
                             final email = _usernameController.text;
                             final password = _passwordController.text;
-                            // context.read<LoginBloc>().add(
-                            //       LoginSubmitted(
-                            //           email: email, password: password),
-                            //     );
 
                             bool isLogin =
                                 await authController.login(email, password);
-
                             if (isLogin) {
                               User? user =
                                   await usercontroller.getUserByEmail(email);

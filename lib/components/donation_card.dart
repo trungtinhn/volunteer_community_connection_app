@@ -6,7 +6,6 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 class DonationCard extends StatelessWidget {
   final String status;
   final String title;
-  final String subtitle;
   final double progress;
   final int donationCount;
   final double currentAmount;
@@ -19,7 +18,6 @@ class DonationCard extends StatelessWidget {
     super.key,
     required this.status,
     required this.title,
-    required this.subtitle,
     required this.progress,
     required this.donationCount,
     required this.currentAmount,
@@ -65,7 +63,7 @@ class DonationCard extends StatelessWidget {
               height: 200,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  image: NetworkImage(imageUrl),
                   fit: BoxFit.fill,
                 ),
               ),

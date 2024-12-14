@@ -83,7 +83,7 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
             Row(
               children: [
                 InputNumberField(
-                    label: 'Số tiên mục tiêu',
+                    label: 'Số tiền mục tiêu',
                     name: '',
                     hinttext: '100000',
                     onChanged: (value) {}),
