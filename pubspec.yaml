@@ -42,12 +42,12 @@ dependencies:
   qr_flutter: ^4.1.0
   get: ^4.6.6
   http: ^1.2.2
+  timeago_flutter: ^3.7.0
 
   signalr_netcore: ^1.4.0
 
   shared_preferences: ^2.2.3
   image_picker: ^1.1.2
-
 
 dev_dependencies:
   flutter_test:

@@ -1,15 +1,104 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/message_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../models/message.dart';
+import '../../services/chat_service.dart';
 
 class DetailChatScreen extends StatefulWidget {
-  const DetailChatScreen({super.key});
+  final Message message;
+  const DetailChatScreen({super.key, required this.message});
 
   @override
   State<DetailChatScreen> createState() => _DetailChatScreenState();
 }
 
 class _DetailChatScreenState extends State<DetailChatScreen> {
-  final List<Map<String, dynamic>> messages = [
+  final ChatService _chatService = ChatService();
+  List<Message> messages = [];
+
+  final MessageController _messageController = MessageController();
+  final Usercontroller _usercontroller = Usercontroller();
+  final TextEditingController _textEditingController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print("Image picker error: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getChat();
+    _initChatService();
+  }
+
+  Future<void> _initChatService() async {
+    await _chatService.initConnection(_usercontroller.getCurrentUser()!.userId);
+
+    _chatService.hubConnection.on('ReceiveMessage', (arguments) {
+      final receiverId = arguments?[1];
+      final senderId = arguments?[0];
+
+      if (receiverId == _usercontroller.getCurrentUser()!.userId &&
+          senderId ==
+              (widget.message.senderId ==
+                      _usercontroller.getCurrentUser()!.userId
+                  ? widget.message.receiverId
+                  : widget.message.senderId)) {
+        _messageController.getLatestMessages();
+        _getChat();
+      }
+    });
+  }
+
+  Future<void> _sendMessage(String message) async {
+    if (_selectedImage == null) {
+      await _chatService.sendMessage(
+          _usercontroller.getCurrentUser()!.userId,
+          widget.message.senderId == _usercontroller.getCurrentUser()!.userId
+              ? widget.message.receiverId
+              : widget.message.senderId,
+          message);
+    } else {
+      await _chatService.sendMessageWithImage(
+        _usercontroller.getCurrentUser()!.userId,
+        widget.message.senderId == _usercontroller.getCurrentUser()!.userId
+            ? widget.message.receiverId
+            : widget.message.senderId,
+        _selectedImage!,
+      );
+
+      _selectedImage = null;
+    }
+
+    _getChat();
+  }
+
+  Future<void> _getChat() async {
+    messages = await _messageController.getChat(
+        widget.message.senderId, widget.message.receiverId);
+    setState(() {});
+  }
+
+  final List<Map<String, dynamic>> messages1 = [
     {
       'sender': 'Bryan',
       'message': 'Looking forward to the trip.',
@@ -47,7 +136,7 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bryan',
+          widget.message.userName,
           style: kLableSize15Black,
         ),
         actions: [
@@ -69,16 +158,36 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
-                if (message.containsKey('imageUrl')) {
+                // if (message.containsKey('imageUrl')) {
+                //   return _buildMessageImage(
+                //     avatar: !message['isMe'],
+                //     imageUrl: message['imageUrl'],
+                //   );
+                // } else {
+                //   return _buildMessageBubble(
+                //     avatar: !message['isMe'],
+                //     message: message['message'],
+                //     isMe: message['isMe'],
+                //   );
+                // }
+
+                if (message.imageUrl != null) {
                   return _buildMessageImage(
-                    avatar: !message['isMe'],
-                    imageUrl: message['imageUrl'],
+                    imageUrl: message.imageUrl!,
+                    isMe: message.senderId ==
+                        _usercontroller.getCurrentUser()!.userId,
+                    haveAvatar: !(message.senderId ==
+                        _usercontroller.getCurrentUser()!.userId),
+                    avatarUrl: message.avatarUrl,
                   );
                 } else {
                   return _buildMessageBubble(
-                    avatar: !message['isMe'],
-                    message: message['message'],
-                    isMe: message['isMe'],
+                    avatarUrl: widget.message.avatarUrl,
+                    haveAvatar: !(message.senderId ==
+                        _usercontroller.getCurrentUser()!.userId),
+                    message: message.content,
+                    isMe: message.senderId ==
+                        _usercontroller.getCurrentUser()!.userId,
                   );
                 }
               },
@@ -94,19 +203,19 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
   Widget _buildMessageBubble({
     required String message,
     required bool isMe,
-    bool avatar = false,
+    bool haveAvatar = false,
+    required String avatarUrl,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        if (!isMe && avatar)
-          const CircleAvatar(
+        if (!isMe && haveAvatar)
+          CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage(
-                'https://via.placeholder.com/150'), // Thay bằng ảnh thực tế
+            backgroundImage: NetworkImage(avatarUrl), // Thay bằng ảnh thực tế
           ),
-        if (!isMe && avatar) const SizedBox(width: 10),
+        if (!isMe && haveAvatar) const SizedBox(width: 10),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 5),
           padding: const EdgeInsets.all(12),
@@ -134,31 +243,43 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
   // Hàm tạo tin nhắn dạng hình ảnh
   Widget _buildMessageImage({
     required String imageUrl,
-    bool avatar = false,
+    bool haveAvatar = false,
+    required bool isMe,
+    required String avatarUrl,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        if (avatar)
-          const CircleAvatar(
+        if (!isMe && haveAvatar)
+          CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+            backgroundImage: NetworkImage(avatarUrl),
           ),
-        if (avatar) const SizedBox(width: 10),
+        if (haveAvatar) const SizedBox(width: 10),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
               height: 150,
               width: 200,
               margin: const EdgeInsets.symmetric(vertical: 5),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/splash1.png',
-                  fit: BoxFit.fill,
-                ),
-              ),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                  )),
             ),
           ],
         ),
@@ -177,19 +298,48 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
         children: [
           IconButton(
             icon: const Icon(Icons.photo),
-            onPressed: () {},
+            onPressed: () => _pickImage(ImageSource.gallery),
           ),
-          const Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Message',
-                border: InputBorder.none,
+          if (_selectedImage != null)
+            Expanded(
+                child: Stack(
+              children: [
+                Image.file(
+                  _selectedImage!,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      setState(() {
+                        _selectedImage = null;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            )),
+          if (_selectedImage == null)
+            Expanded(
+              child: TextField(
+                controller: _textEditingController,
+                decoration: const InputDecoration(
+                  hintText: 'Message',
+                  border: InputBorder.none,
+                ),
               ),
             ),
-          ),
           IconButton(
             icon: const Icon(Icons.send),
-            onPressed: () {},
+            onPressed: () {
+              _sendMessage(_textEditingController.text);
+              _textEditingController.clear();
+            },
           ),
         ],
       ),
