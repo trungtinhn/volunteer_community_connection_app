@@ -2,18 +2,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String API_URL = 'https://39a6-42-112-244-29.ngrok-free.app/api';
+  static const String API_URL = 'https://8526-14-169-91-230.ngrok-free.app';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(
-      String endpoint, Map<String, dynamic> data) async {
+      String endpoint, Map<String, dynamic>? data) async {
     final url = Uri.parse('$API_URL$endpoint');
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
+      final response = data != null
+          ? await http.post(
+              url,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(data),
+            )
+          : await http.post(url);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
