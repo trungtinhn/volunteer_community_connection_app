@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/models/community.dart';
 import 'package:volunteer_community_connection_app/repositories/community_repository.dart';
@@ -36,5 +38,10 @@ class CommunityController extends GetxController {
 
   Future<void> getCommunitiesEnded() async {
     communitiesEnd.value = await _communityRepository.getCommunitiesEnded();
+  }
+
+  Future<void> createCommunityWithImage(
+      Map<String, String> communityData, File? image) async {
+    await _communityRepository.createCommunityWithImage(communityData, image);
   }
 }

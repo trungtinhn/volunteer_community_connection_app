@@ -30,7 +30,7 @@ final kLableTilteBlack = GoogleFonts.montserrat(
     textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18.0));
 
 final kLableSize16Black = GoogleFonts.inter(
-    textStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 18.0));
+    textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0));
 
 final kLableSize18w700Black = GoogleFonts.inter(
     textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18.0));
