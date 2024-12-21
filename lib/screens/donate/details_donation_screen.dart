@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/screens/donate/donation_screen.dart';
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
@@ -30,6 +32,10 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
   bool isExpanded = false;
   int _selectedTabIndex = 0;
 
+  int communityId = 1;
+
+  final PostController _postController = Get.put(PostController());
+
   @override
   void initState() {
     super.initState();
@@ -42,12 +48,19 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         });
       }
     });
+
+    loadPosts();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> loadPosts() async {
+    _postController.loadedPosts.value =
+        await _postController.getPostsByCommunity(communityId);
   }
 
   Color _getStatusBackgroundColor(String status) {

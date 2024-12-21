@@ -3,8 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 
+import '../../models/post.dart';
+
 class DetailPostScreen extends StatefulWidget {
-  const DetailPostScreen({super.key});
+  final Post post;
+  const DetailPostScreen({super.key, required this.post});
 
   @override
   State<DetailPostScreen> createState() => _DetailPostScreenState();
@@ -74,15 +77,15 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage(postData['imageUrl']),
+                    backgroundImage: NetworkImage(widget.post.avatarUrl!),
                     radius: 25,
                   ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(postData['username'], style: kLableSize15Black),
-                      Text(postData['timeAgo'], style: kLableSize13Grey),
+                      Text(widget.post.userName, style: kLableSize15Black),
+                      Text(widget.post.timeAgo!, style: kLableSize13Grey),
                     ],
                   ),
                   Row(
@@ -105,7 +108,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                postData['description'],
+                widget.post.content,
                 maxLines: isExpanded ? null : 2,
                 overflow:
                     isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
@@ -145,8 +148,12 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
               ),
             const SizedBox(height: 10),
             // Ảnh bài viết
-            Center(
-                child: Image.network(postData['imageUrl'], fit: BoxFit.cover)),
+
+            widget.post.imageUrl != null
+                ? Center(
+                    child:
+                        Image.network(postData['imageUrl'], fit: BoxFit.cover))
+                : const SizedBox.shrink(),
             // Like, Comment, Share
             Padding(
               padding: const EdgeInsets.all(10),
@@ -159,7 +166,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                           onTap: () {},
                           child: SvgPicture.asset('assets/svgs/heart.svg')),
                       const SizedBox(width: 5),
-                      Text(postData['likes'].toString(),
+                      Text(widget.post.likeCount.toString(),
                           style: kLableSize13Black),
                     ],
                   ),
@@ -167,7 +174,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                     children: [
                       SvgPicture.asset('assets/svgs/comment.svg'),
                       const SizedBox(width: 5),
-                      Text(postData['comments'].toString(),
+                      Text(widget.post.commentCount.toString(),
                           style: kLableSize13Black),
                     ],
                   ),
@@ -177,8 +184,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                           onTap: () {},
                           child: SvgPicture.asset('assets/svgs/send.svg')),
                       const SizedBox(width: 5),
-                      Text(postData['shares'].toString(),
-                          style: kLableSize13Black),
+                      Text('1', style: kLableSize13Black),
                     ],
                   ),
                 ],
