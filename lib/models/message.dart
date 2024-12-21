@@ -6,6 +6,10 @@ class Message {
   final DateTime sentAt;
   final bool isRead;
   final int unreadCount;
+  final String userName;
+  final String avatarUrl;
+  late String? timeAgo;
+  final String? imageUrl;
 
   Message(
       {required this.id,
@@ -14,7 +18,10 @@ class Message {
       required this.content,
       required this.sentAt,
       required this.isRead,
-      required this.unreadCount});
+      required this.unreadCount,
+      required this.userName,
+      required this.avatarUrl,
+      required this.imageUrl});
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
@@ -25,6 +32,9 @@ class Message {
       sentAt: DateTime.parse(json['sentAt']),
       isRead: json['isRead'],
       unreadCount: json['unreadCount'],
+      userName: json['userName'],
+      avatarUrl: json['avatarUrl'],
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -36,7 +46,10 @@ class Message {
       'content': content,
       'sentAt': sentAt.toIso8601String(),
       'isRead': isRead,
-      'unreadCount': unreadCount
+      'unreadCount': unreadCount,
+      'userName': userName,
+      'avatarUrl': avatarUrl,
+      'imageUrl': imageUrl
     };
   }
 }
