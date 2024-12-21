@@ -2,27 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/models/post.dart';
 
 class PostCard extends StatefulWidget {
-  final String username;
-  final String timeAgo;
-  final String description;
-  final String imageUrl;
-  final int likes;
-  final int comments;
-  final int shares;
+  final Post post;
   final VoidCallback onTap;
 
-  const PostCard(
-      {super.key,
-      required this.username,
-      required this.timeAgo,
-      required this.description,
-      required this.imageUrl,
-      required this.likes,
-      required this.comments,
-      required this.shares,
-      required this.onTap});
+  const PostCard({super.key, required this.post, required this.onTap});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -48,22 +34,24 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(widget.imageUrl),
-                          fit: BoxFit.fill,
-                        ),
-                        shape: BoxShape.circle),
-                  ),
+                  widget.post.avatarUrl != null
+                      ? Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(widget.post.avatarUrl!),
+                                fit: BoxFit.fill,
+                              ),
+                              shape: BoxShape.circle),
+                        )
+                      : const SizedBox.shrink(),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.username, style: kLableSize15Black),
-                      Text(widget.timeAgo, style: kLableSize13Grey),
+                      Text(widget.post.userName, style: kLableSize15Black),
+                      Text(widget.post.timeAgo!, style: kLableSize13Grey),
                     ],
                   ),
                 ],
@@ -72,7 +60,7 @@ class _PostCardState extends State<PostCard> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                widget.description,
+                widget.post.content,
                 maxLines: isExpanded ? null : 2,
                 overflow:
                     isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
@@ -113,7 +101,9 @@ class _PostCardState extends State<PostCard> {
                 ),
               ),
             const SizedBox(height: 10),
-            Image.asset(widget.imageUrl, fit: BoxFit.cover),
+            widget.post.imageUrl != null
+                ? Image.asset(widget.post.imageUrl!, fit: BoxFit.cover)
+                : const SizedBox.shrink(),
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -124,7 +114,7 @@ class _PostCardState extends State<PostCard> {
                       SvgPicture.asset('assets/svgs/heart.svg'),
                       const SizedBox(width: 5),
                       Text(
-                        widget.likes.toString(),
+                        widget.post.likeCount.toString(),
                         style: kLableSize13Black,
                       ),
                     ],
@@ -133,7 +123,7 @@ class _PostCardState extends State<PostCard> {
                     children: [
                       SvgPicture.asset('assets/svgs/comment.svg'),
                       const SizedBox(width: 5),
-                      Text(widget.comments.toString(),
+                      Text(widget.post.commentCount.toString(),
                           style: kLableSize13Black),
                     ],
                   ),
@@ -141,7 +131,7 @@ class _PostCardState extends State<PostCard> {
                     children: [
                       SvgPicture.asset('assets/svgs/send.svg'),
                       const SizedBox(width: 5),
-                      Text(widget.shares.toString(), style: kLableSize13Black),
+                      Text('1', style: kLableSize13Black),
                     ],
                   ),
                 ],

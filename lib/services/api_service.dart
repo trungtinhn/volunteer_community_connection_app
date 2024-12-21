@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String API_URL = 'https://8526-14-169-91-230.ngrok-free.app';
+  static const String API_URL = 'https://32c3-14-169-90-28.ngrok-free.app';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(
