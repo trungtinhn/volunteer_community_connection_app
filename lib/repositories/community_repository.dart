@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:volunteer_community_connection_app/models/community.dart';
 import 'package:volunteer_community_connection_app/services/api_service.dart';
 
@@ -27,5 +29,11 @@ class CommunityRepository {
   Future<List<Community>> getCommunitiesEnded() async {
     final data = await _apiService.getAll('/api/Community/get-completed');
     return List<Community>.from(data.map((e) => Community.fromJson(e)));
+  }
+
+  Future<Map<String, dynamic>> createCommunityWithImage(
+      Map<String, String> communityData, File? image) async {
+    return await _apiService.createFormDataWithImage(
+        '/api/Community', communityData, image);
   }
 }
