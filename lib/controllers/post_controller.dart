@@ -21,4 +21,8 @@ class PostController extends GetxController {
 
     return posts;
   }
+
+  Future<void> setEmptyPosts() async {
+    loadedPosts.value = <Post>[];
+  }
 }
