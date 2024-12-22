@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
+import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/screens/account/bloc_sign_up/sign_up_event.dart';
 import 'package:volunteer_community_connection_app/screens/account/login_screen.dart';
 import 'package:intl/intl.dart';
@@ -25,11 +28,13 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController dayOfBirthController = TextEditingController();
   DateTime dayOfBirth = DateTime.now();
+
+  final Authcontroller _authcontroller = Get.put(Authcontroller());
 
   String formatDate(DateTime dateTime) {
     return DateFormat('dd/MM/yyyy').format(dateTime);
@@ -50,8 +55,69 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
+  Future<bool> _validate() async {
+    if (fullNameController.text.isEmpty) {
+      return false;
+    }
+    if (emailController.text.isEmpty) {
+      return false;
+    }
+    if (phoneNumberController.text.isEmpty) {
+      return false;
+    }
+    if (passwordController.text.isEmpty) {
+      return false;
+    }
+    if (confirmPasswordController.text.isEmpty) {
+      return false;
+    }
+    if (dayOfBirthController.text.isEmpty) {
+      return false;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    void _showSnackBar(String message) {
+      final snackBar = SnackBar(
+        content: Text(message),
+      );
+
+      // Hiển thị SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    void _signUp() async {
+      print('Full name: ${fullNameController.text}');
+      if (await _validate()) {
+        User user = User(
+          userId: 0,
+          name: fullNameController.text,
+          email: emailController.text,
+          phoneNumber: phoneNumberController.text,
+          dayOfBirth: dayOfBirth,
+          role: 'user',
+          avatarUrl: '',
+        );
+        var result =
+            await _authcontroller.register(user, passwordController.text);
+        if (result) {
+          _showSnackBar('Sign Up successful');
+          Navigator.pop(context);
+        } else {
+          _showSnackBar('Sign Up failed');
+        }
+      } else {
+        _showSnackBar('Sign Up failed');
+      }
+    }
+
     return BlocListener<SignUpBloc, SignUpState>(listener: (context, state) {
       if (state is SignUpFailure) {
         ScaffoldMessenger.of(context)
@@ -144,11 +210,11 @@ class _SignUpFormState extends State<SignUpForm> {
                   height: 20,
                 ),
                 TextFormField(
-                    controller: usernameController,
+                    controller: phoneNumberController,
                     onChanged: (value) {},
                     style: kLableTextBlackMinium,
                     decoration: InputDecoration(
-                        labelText: 'Username',
+                        labelText: 'Phone number',
                         enabledBorder: const OutlineInputBorder(
                           // viền khi không có focus
                           borderSide: BorderSide(color: AppColors.stack),
@@ -309,7 +375,15 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
                 ButtonBlue(
                   isLoading: _isLoading,
-                  onPress: () {},
+                  onPress: () {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    _signUp();
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
                   des: 'Sign Up',
                 ),
                 const SizedBox(
