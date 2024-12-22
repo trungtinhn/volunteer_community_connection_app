@@ -11,6 +11,9 @@ class Community {
   final String imageUrl;
   final double currentAmount;
   final int donationCount;
+  final String type;
+  final double longtitude;
+  final double latitude;
 
   Community({
     required this.communityId,
@@ -25,22 +28,27 @@ class Community {
     required this.imageUrl,
     required this.currentAmount,
     required this.donationCount,
+    required this.type,
+    required this.longtitude,
+    required this.latitude,
   });
 
   factory Community.fromJson(Map<String, dynamic> json) {
     return Community(
-      communityId: json['communityId'] as int,
-      communityName: json['communityName'] as String,
-      description: json['description'] as String,
-      isPublished: json['isPublished'] as bool,
-      adminId: json['adminId'] as int,
-      createDate: DateTime.parse(json['createDate'] as String),
-      startDate: DateTime.parse(json['startDate'] as String),
-      endDate: DateTime.parse(json['endDate'] as String),
-      targetAmount: json['targetAmount'] as double,
-      imageUrl: json['imageUrl'] as String,
-      currentAmount: json['currentAmount'] as double,
-      donationCount: json['donationCount'] as int,
-    );
+        communityId: json['communityId'] as int,
+        communityName: json['communityName'] as String,
+        description: json['description'] as String,
+        isPublished: json['isPublished'] as bool,
+        adminId: json['adminId'] as int,
+        createDate: DateTime.parse(json['createDate'] as String),
+        startDate: DateTime.parse(json['startDate'] as String),
+        endDate: DateTime.parse(json['endDate'] as String),
+        targetAmount: json['targetAmount'] as double,
+        imageUrl: json['imageUrl'] as String,
+        currentAmount: json['currentAmount'] as double,
+        donationCount: json['donationCount'] as int,
+        type: json['type'] as String,
+        longtitude: json['longtitude'] as double,
+        latitude: json['latitude'] as double);
   }
 }
