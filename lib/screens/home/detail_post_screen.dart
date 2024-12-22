@@ -21,9 +21,11 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
 
   final CommentController _commentController = Get.put(CommentController());
 
+  String? replyTo; // Tên người dùng đang được trả lời
+  final TextEditingController commentController = TextEditingController();
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchComments();
   }
@@ -84,144 +86,157 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(widget.post.avatarUrl!),
-                    radius: 25,
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(widget.post.avatarUrl!),
+                          radius: 25,
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.post.userName,
+                                style: kLableSize15Black),
+                            Text(widget.post.timeAgo!, style: kLableSize13Grey),
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 15,
+                              color: AppColors.blue,
+                            ),
+                            Text('Hỗ trợ bão cho đồng bào',
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: kLableSize15Bluew600),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(widget.post.userName, style: kLableSize15Black),
-                      Text(widget.post.timeAgo!, style: kLableSize13Grey),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      widget.post.content,
+                      maxLines: isExpanded ? null : 2,
+                      overflow: isExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
+                    ),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: AppColors.blue,
+                  if (!isExpanded)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isExpanded = !isExpanded;
+                        });
+                      },
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        child: Text(
+                          'Xem thêm',
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      Text('Hỗ trợ bão cho đồng bào',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: kLableSize15Bluew600),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                widget.post.content,
-                maxLines: isExpanded ? null : 2,
-                overflow:
-                    isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-              ),
-            ),
-            if (!isExpanded)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Text(
-                    'Xem thêm',
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            if (isExpanded)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Text(
-                    'Thu gọn',
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            const SizedBox(height: 10),
-            // Ảnh bài viết
+                    ),
+                  if (isExpanded)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isExpanded = !isExpanded;
+                        });
+                      },
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        child: Text(
+                          'Thu gọn',
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  // Ảnh bài viết
 
-            widget.post.imageUrl != null
-                ? Center(
-                    child:
-                        Image.network(postData['imageUrl'], fit: BoxFit.cover))
-                : const SizedBox.shrink(),
-            // Like, Comment, Share
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () {},
-                          child: SvgPicture.asset('assets/svgs/heart.svg')),
-                      const SizedBox(width: 5),
-                      Text(widget.post.likeCount.toString(),
-                          style: kLableSize13Black),
-                    ],
+                  widget.post.imageUrl != null
+                      ? Center(
+                          child: Image.network(postData['imageUrl'],
+                              fit: BoxFit.cover))
+                      : const SizedBox.shrink(),
+                  // Like, Comment, Share
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                                onTap: () {},
+                                child:
+                                    SvgPicture.asset('assets/svgs/heart.svg')),
+                            const SizedBox(width: 5),
+                            Text(widget.post.likeCount.toString(),
+                                style: kLableSize13Black),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SvgPicture.asset('assets/svgs/comment.svg'),
+                            const SizedBox(width: 5),
+                            Text(widget.post.commentCount.toString(),
+                                style: kLableSize13Black),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                                onTap: () {},
+                                child:
+                                    SvgPicture.asset('assets/svgs/send.svg')),
+                            const SizedBox(width: 5),
+                            Text('1', style: kLableSize13Black),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/svgs/comment.svg'),
-                      const SizedBox(width: 5),
-                      Text(widget.post.commentCount.toString(),
-                          style: kLableSize13Black),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () {},
-                          child: SvgPicture.asset('assets/svgs/send.svg')),
-                      const SizedBox(width: 5),
-                      Text('1', style: kLableSize13Black),
-                    ],
+                  const Divider(),
+                  // Danh sách bình luận
+                  Obx(
+                    () => Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: _commentController.loadedComment
+                            .where((comment) => comment.parentCommentId == null)
+                            .map((comment) => _buildComment(comment))
+                            .toList(),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const Divider(),
-            // Danh sách bình luận
-            Obx(
-              () => Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: _commentController.loadedComment
-                      .where((comment) => comment.parentCommentId == null)
-                      .map((comment) => _buildComment(comment))
-                      .toList(),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+          _buildCommentInput(),
+        ],
       ),
     );
   }
@@ -301,6 +316,87 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                     (replies).map((child) => _buildComment(child)).toList(),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  // Thanh nhập bình luận
+  Widget _buildCommentInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (replyTo != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 10, bottom: 5),
+              child: Row(
+                children: [
+                  Text('Trả lời $replyTo', style: kLableSize13Grey),
+                  const SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        replyTo = null;
+                      });
+                    },
+                    child:
+                        const Icon(Icons.close, size: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/image_sample.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextFormField(
+                  controller: commentController,
+                  onChanged: (value) => {},
+                  decoration: InputDecoration(
+                      hintText: 'Nhập bình luận...',
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.greyIron),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            const BorderSide(color: AppColors.greyShuttle),
+                      ),
+                      labelStyle: const TextStyle(
+                          fontFamily: 'CeraPro', fontWeight: FontWeight.w400),
+                      filled: true,
+                      fillColor: AppColors.white),
+                  style: kLableSize15Black,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send, color: Colors.blue),
+                onPressed: () {
+                  debugPrint(
+                      'Đã gửi bình luận: ${commentController.text} - Trả lời: $replyTo');
+                  setState(() {
+                    commentController.clear();
+                    replyTo = null;
+                  });
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );

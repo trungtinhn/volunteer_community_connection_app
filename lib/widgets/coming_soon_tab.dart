@@ -14,38 +14,6 @@ class ComingSoonTab extends StatefulWidget {
 class ComingSoonTabState extends State<ComingSoonTab> {
   final CommunityController communityController =
       Get.put(CommunityController());
-  // final List<Map<String, dynamic>> donationData = [
-  //   {
-  //     "status": "Sắp diễn ra",
-  //     "title": "Xây dựng trường học vùng cao",
-  //     "subtitle": "Giúp trẻ em vùng cao có điều kiện học tập tốt hơn",
-  //     "progress": 0.25,
-  //     "donationCount": 50,
-  //     "currentAmount": 25000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/school_building.jpg",
-  //   },
-  //   {
-  //     "status": "Sắp diễn ra",
-  //     "title": "Xây dựng trường học vùng cao",
-  //     "subtitle": "Giúp trẻ em vùng cao có điều kiện học tập tốt hơn",
-  //     "progress": 0.25,
-  //     "donationCount": 50,
-  //     "currentAmount": 25000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/school_building.jpg",
-  //   },
-  //   {
-  //     "status": "Sắp diễn ra",
-  //     "title": "Xây dựng trường học vùng cao",
-  //     "subtitle": "Giúp trẻ em vùng cao có điều kiện học tập tốt hơn",
-  //     "progress": 0.25,
-  //     "donationCount": 50,
-  //     "currentAmount": 25000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/school_building.jpg",
-  //   },
-  // ];
 
   @override
   void initState() {
@@ -75,10 +43,11 @@ class ComingSoonTabState extends State<ComingSoonTab> {
             child: DonationCard(
               status: 'Sắp diễn ra',
               title: data.communityName,
+              type: data.type,
               progress: 0,
               donationCount: data.donationCount,
               currentAmount: data.currentAmount,
-              goalAmount: data.targetAmount,
+              goalAmount: data.targetAmount ?? 0,
               imageUrl: data.imageUrl,
               onDetails: () {
                 Get.to(() => const DetailsDonationScreen());
