@@ -6,7 +6,7 @@ class ApiService {
   
   // ignore: constant_identifier_names
   static const String API_URL =
-      'https://fe9f-2405-4802-8114-a1a0-f070-6f35-bffb-c22c.ngrok-free.app';
+      'https://ef36-2405-4802-8114-a1a0-f070-6f35-bffb-c22c.ngrok-free.app';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(
