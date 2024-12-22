@@ -535,14 +535,7 @@ packages:
       sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7945f9573ca0613f3bd2a7d0f9ecd297b5fb39fc
     version: "0.11.1"
-=======
-    version: "0.8.0"
->>>>>>> c277efec1dcdd444fdee6d79fd5fe4730afc3190
   message_pack_dart:
     dependency: transitive
     description:
@@ -558,13 +551,7 @@ packages:
       sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
     version: "1.15.0"
-=======
-<<<<<<< HEAD
-    version: "1.15.0"
-=======
-    version: "1.11.0"
   mgrs_dart:
     dependency: transitive
     description:
@@ -573,9 +560,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-
->>>>>>> c277efec1dcdd444fdee6d79fd5fe4730afc3190
->>>>>>> 7945f9573ca0613f3bd2a7d0f9ecd297b5fb39fc
   mime:
     dependency: transitive
     description:
@@ -740,23 +724,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7945f9573ca0613f3bd2a7d0f9ecd297b5fb39fc
       sha256: "02a7d8a9ef346c9af715811b01fbd8e27845ad2c41148eefd31321471b41863d"
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
-<<<<<<< HEAD
-=======
-=======
-      sha256: "1ee8bf911094a1b592de7ab29add6f826a7331fb854273d55918693d5364a1f2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.2"
->>>>>>> c277efec1dcdd444fdee6d79fd5fe4730afc3190
->>>>>>> 7945f9573ca0613f3bd2a7d0f9ecd297b5fb39fc
   shared_preferences_foundation:
     dependency: transitive
     description:

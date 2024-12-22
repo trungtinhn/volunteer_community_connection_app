@@ -5,6 +5,7 @@ class User {
   final String phoneNumber;
   final String avatarUrl;
   final String role;
+  final DateTime dayOfBirth;
   final String? token;
 
   User(
@@ -14,6 +15,7 @@ class User {
       required this.phoneNumber,
       required this.avatarUrl,
       required this.role,
+      required this.dayOfBirth,
       this.token});
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class User {
       avatarUrl: json['avatarUrl'] ?? '',
       role: json['role'] ?? '',
       token: json['token'] ?? '',
+      dayOfBirth: DateTime.parse(json['dayOfBirth'] ?? ''),
     );
   }
 
@@ -36,7 +39,8 @@ class User {
       'phoneNumber': phoneNumber,
       'avatarUrl': avatarUrl,
       'role': role,
-      'token': token
+      'token': token,
+      'dayOfBirth': dayOfBirth.toIso8601String(),
     };
   }
 }
