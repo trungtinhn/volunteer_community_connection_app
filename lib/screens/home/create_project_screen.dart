@@ -1,13 +1,19 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
+import 'package:volunteer_community_connection_app/components/input_image.dart';
 import 'package:volunteer_community_connection_app/components/input_number.dart';
+import 'package:volunteer_community_connection_app/components/input_select.dart';
 import 'package:volunteer_community_connection_app/components/input_text.dart';
 import 'package:volunteer_community_connection_app/components/input_text_multiline.dart';
 import 'package:volunteer_community_connection_app/components/input_time.dart';
+import 'package:volunteer_community_connection_app/components/location_picker.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 
 class CreateProjectScreen extends StatefulWidget {
   const CreateProjectScreen({super.key});
@@ -17,6 +23,88 @@ class CreateProjectScreen extends StatefulWidget {
 }
 
 class _CreateProjectScreenState extends State<CreateProjectScreen> {
+  CommunityController communityController = Get.put(CommunityController());
+  Usercontroller userController = Get.put(Usercontroller());
+  File? selectedImage;
+  String selectedProjectType = 'Quyên góp tiền';
+  String name = '';
+  String description = '';
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now().add(const Duration(days: 3));
+  String? targetAmount;
+  double? latitude;
+  double? longitude;
+
+  void _createProject(BuildContext context) async {
+    // Kiểm tra dữ liệu hợp lệ
+    if (name.isEmpty || description.isEmpty) {
+      _showMessage('Vui lòng điền đầy đủ thông tin bắt buộc.');
+      return;
+    }
+    if (startDate.isAfter(endDate)) {
+      _showMessage('Ngày bắt đầu phải trước ngày kết thúc.');
+      return;
+    }
+    if (selectedProjectType == 'Quyên góp tiền' &&
+        (targetAmount == null || targetAmount!.isEmpty)) {
+      _showMessage('Vui lòng nhập số tiền mục tiêu.');
+      return;
+    }
+    if (selectedProjectType == 'Quyên góp đồ vật' &&
+        (latitude == null || longitude == null)) {
+      _showMessage('Vui lòng chọn vị trí quyên góp.');
+      return;
+    }
+    if (selectedImage == null) {
+      _showMessage('Vui lòng tải lên ảnh minh họa.');
+      return;
+    }
+
+    // Chuẩn bị dữ liệu dự án
+    final Map<String, String> communityData = {
+      "CommunityName": name,
+      "Description": description,
+      "IsPublished": "false", // Mặc định là false
+      "AdminId": userController.currentUser.value!.userId.toString(),
+      "CreateDate": DateTime.now().toIso8601String(),
+      "StartDate": startDate.toIso8601String(),
+      "EndDate": endDate.toIso8601String(),
+      "TargetAmount": targetAmount ?? "",
+      "Type": selectedProjectType,
+      "Latitude": latitude?.toString() ?? "",
+      "Longitude": longitude?.toString() ?? "",
+    };
+
+    try {
+      // Gọi controller để tạo dự án
+      await communityController.createCommunityWithImage(
+        communityData,
+        selectedImage,
+      );
+
+      _showMessage('Tạo dự án thành công', isSuccess: true);
+    } catch (e) {
+      _showMessage('Tạo dự án khóa thất bại: $e', isSuccess: false);
+    }
+  }
+
+  // Hiển thị thông báo
+  void _showMessage(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+      ),
+    );
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pop(context);
+    });
+  }
+
+  String formatDate(DateTime date) {
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +129,9 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                   name: '',
                   hinttext: 'Vì một hành tinh xanh',
                   isRequired: true,
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    name = value;
+                  },
                 ),
               ],
             ),
@@ -54,7 +144,9 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                     label: 'Mô tả',
                     name: '',
                     hinttext: 'Nhập mô tả',
-                    onChanged: (value) {}),
+                    onChanged: (value) {
+                      description = value;
+                    }),
               ],
             ),
             const SizedBox(
@@ -65,16 +157,20 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
                 InputTimePicker(
                     label: 'Ngày bắt đầu',
                     name: '',
-                    hinttext: '',
-                    onChanged: (value) {}),
+                    hinttext: formatDate(startDate),
+                    onChanged: (value) {
+                      startDate = value;
+                    }),
                 const SizedBox(
                   width: 8,
                 ),
                 InputTimePicker(
                     label: 'Ngày kết thúc',
                     name: '',
-                    hinttext: '',
-                    onChanged: (value) {})
+                    hinttext: formatDate(endDate),
+                    onChanged: (value) {
+                      endDate = value;
+                    })
               ],
             ),
             const SizedBox(
@@ -82,11 +178,62 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
             ),
             Row(
               children: [
-                InputNumberField(
-                    label: 'Số tiền mục tiêu',
-                    name: '',
-                    hinttext: '100000',
-                    onChanged: (value) {}),
+                InputSelectData(
+                  list: const [
+                    'Quyên góp tiền',
+                    'Quyên góp đồ vật'
+                  ], // Danh sách loại dự án
+                  selectedOption: 'Quyên góp tiền', // Lựa chọn mặc định
+                  onChanged: (value) {
+                    setState(() {
+                      selectedProjectType = value;
+                    });
+                  },
+                  label: 'Loại dự án',
+                  hinttext: 'Chọn loại dự án',
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            if (selectedProjectType ==
+                'Quyên góp tiền') // Hiện trường "Số tiền mục tiêu"
+              Row(
+                children: [
+                  InputNumberField(
+                      label: 'Số tiền mục tiêu',
+                      name: '',
+                      hinttext: 'Nhập số tiền',
+                      onChanged: (value) {
+                        targetAmount = value;
+                      }),
+                ],
+              ),
+            if (selectedProjectType ==
+                'Quyên góp đồ vật') // Hiện trường "Vị trí quyên góp"
+              Row(
+                children: [
+                  LocationPicker(
+                    onLocationSelected: (value) {
+                      latitude = value.latitude;
+                      longitude = value.longitude;
+                    },
+                    label: 'Vị trí quyên góp',
+                  ),
+                ],
+              ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                InputImage(
+                  label: 'Ảnh minh họa',
+                  onImagePicked: (File? image) {
+                    selectedImage = image;
+                  },
+                ),
               ],
             ),
             const SizedBox(
@@ -94,7 +241,8 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ButtonBlue(des: 'Tạo dự án', onPress: () {}),
+              child: ButtonBlue(
+                  des: 'Tạo dự án', onPress: () => _createProject(context)),
             )
           ],
         ),

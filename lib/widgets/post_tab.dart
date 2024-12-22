@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/screens/home/create_post_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
@@ -37,6 +39,8 @@ class PostTabState extends State<PostTab> {
       'shares': 12,
     },
   ];
+
+  final PostController _postController = Get.put(PostController());
 
   @override
   Widget build(BuildContext context) {
@@ -85,31 +89,29 @@ class PostTabState extends State<PostTab> {
               )
             ],
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              var post = posts[index];
-              return PostCard(
-                username: post['username'],
-                timeAgo: post['timeAgo'],
-                description: post['description'],
-                imageUrl: post['imageUrl'],
-                likes: post['likes'],
-                comments: post['comments'],
-                shares: post['shares'],
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DetailPostScreen(),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+          Obx(
+            () => ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _postController.loadedPosts.length,
+              itemBuilder: (context, index) {
+                var post = _postController.loadedPosts[index];
+                return PostCard(
+                  post: post,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPostScreen(
+                          post: post,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          )
         ],
       ),
     );
