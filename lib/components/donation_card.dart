@@ -6,6 +6,7 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 class DonationCard extends StatelessWidget {
   final String status;
   final String title;
+  final String type;
   final double progress;
   final int donationCount;
   final double currentAmount;
@@ -18,6 +19,7 @@ class DonationCard extends StatelessWidget {
     super.key,
     required this.status,
     required this.title,
+    required this.type,
     required this.progress,
     required this.donationCount,
     required this.currentAmount,
@@ -116,19 +118,21 @@ class DonationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          minHeight: 12,
-                          borderRadius: BorderRadius.circular(8),
-                          value: progress,
-                          backgroundColor: Colors.grey[200],
-                          color: AppColors.green,
+                  if ({'Quyên góp tiền'}.contains(type))
+                    Row(
+                      children: [
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            minHeight: 12,
+                            borderRadius: BorderRadius.circular(8),
+                            value: progress,
+                            backgroundColor: Colors.grey[200],
+                            color: AppColors.green,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+
                   const SizedBox(height: 8),
 
                   Row(
@@ -142,7 +146,8 @@ class DonationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  if ({'Đang diễn ra'}.contains(status))
+                  if ({'Đang diễn ra'}.contains(status) &&
+                      type == 'Quyên góp tiền')
                     ButtonBlue(des: 'Quyên góp ngay', onPress: onDonate),
                 ],
               ),

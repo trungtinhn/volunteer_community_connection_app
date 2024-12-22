@@ -7,13 +7,13 @@ class Community {
   final DateTime createDate;
   final DateTime startDate;
   final DateTime endDate;
-  final double targetAmount;
+  final double? targetAmount;
   final String imageUrl;
   final double currentAmount;
   final int donationCount;
   final String type;
-  final double longtitude;
-  final double latitude;
+  final double? longtitude;
+  final double? latitude;
 
   Community({
     required this.communityId,
@@ -43,12 +43,14 @@ class Community {
         createDate: DateTime.parse(json['createDate'] as String),
         startDate: DateTime.parse(json['startDate'] as String),
         endDate: DateTime.parse(json['endDate'] as String),
-        targetAmount: json['targetAmount'] as double,
+        targetAmount: json['targetAmount'],
         imageUrl: json['imageUrl'] as String,
-        currentAmount: json['currentAmount'] as double,
+        currentAmount: (json['currentAmount'] is int)
+            ? (json['currentAmount'] as int).toDouble()
+            : json['currentAmount'],
         donationCount: json['donationCount'] as int,
         type: json['type'] as String,
-        longtitude: json['longtitude'] as double,
-        latitude: json['latitude'] as double);
+        longtitude: json['longtitude'],
+        latitude: json['latitude']);
   }
 }

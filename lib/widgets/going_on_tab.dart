@@ -14,39 +14,6 @@ class GoingOnTab extends StatefulWidget {
 class GoingOnTabState extends State<GoingOnTab> {
   CommunityController communityController = Get.put(CommunityController());
 
-  // final List<Map<String, dynamic>> donationData = [
-  //   {
-  //     "status": "Đang diễn ra",
-  //     "title": "Cứu trợ lũ lụt miền Trung",
-  //     "subtitle": "Ủng hộ đồng bào miền Trung vượt qua thiên tai",
-  //     "progress": 0.65,
-  //     "donationCount": 120,
-  //     "currentAmount": 65000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/flood_relief.jpg",
-  //   },
-  //   {
-  //     "status": "Đang diễn ra",
-  //     "title": "Cứu trợ lũ lụt miền Trung",
-  //     "subtitle": "Ủng hộ đồng bào miền Trung vượt qua thiên tai",
-  //     "progress": 0.65,
-  //     "donationCount": 120,
-  //     "currentAmount": 65000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/flood_relief.jpg",
-  //   },
-  //   {
-  //     "status": "Đang diễn ra",
-  //     "title": "Cứu trợ lũ lụt miền Trung",
-  //     "subtitle": "Ủng hộ đồng bào miền Trung vượt qua thiên tai",
-  //     "progress": 0.65,
-  //     "donationCount": 120,
-  //     "currentAmount": 65000000.0,
-  //     "goalAmount": 100000000.0,
-  //     "imageUrl": "assets/images/flood_relief.jpg",
-  //   },
-  // ];
-
   @override
   void initState() {
     super.initState();
@@ -74,16 +41,20 @@ class GoingOnTabState extends State<GoingOnTab> {
         itemCount: communityController.communitiesGoing.value!.length,
         itemBuilder: (context, index) {
           final data = communityController.communitiesGoing.value![index];
-          double progress = data.currentAmount / data.targetAmount;
+          double progress = 0.0;
+          if (data.targetAmount != null) {
+            progress = data.currentAmount / data.targetAmount!;
+          }
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: DonationCard(
               status: 'Đang diễn ra',
               title: data.communityName,
+              type: data.type,
               progress: progress,
               donationCount: data.donationCount,
               currentAmount: data.currentAmount,
-              goalAmount: data.targetAmount,
+              goalAmount: data.targetAmount ?? 0,
               imageUrl: data.imageUrl,
               onDetails: () {
                 Get.to(() => const DetailsDonationScreen());
