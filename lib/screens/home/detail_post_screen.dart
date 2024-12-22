@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/comment_controller.dart';
+import 'package:volunteer_community_connection_app/models/comment.dart';
+
+import '../../models/post.dart';
 
 class DetailPostScreen extends StatefulWidget {
-  const DetailPostScreen({super.key});
+  final Post post;
+  const DetailPostScreen({super.key, required this.post});
 
   @override
   State<DetailPostScreen> createState() => _DetailPostScreenState();
@@ -12,8 +18,17 @@ class DetailPostScreen extends StatefulWidget {
 
 class _DetailPostScreenState extends State<DetailPostScreen> {
   bool isExpanded = false;
+
+  final CommentController _commentController = Get.put(CommentController());
+
   String? replyTo; // Tên người dùng đang được trả lời
   final TextEditingController commentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchComments();
+  }
 
   final Map<String, dynamic> postData = {
     "username": "Nguyễn Văn A",
@@ -56,6 +71,11 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
     },
   ];
 
+  Future<void> _fetchComments() async {
+    _commentController.loadedComment.value =
+        await _commentController.getCommentsByPost(widget.post.postId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,16 +99,16 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(postData['imageUrl']),
+                          backgroundImage: NetworkImage(widget.post.avatarUrl!),
                           radius: 25,
                         ),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(postData['username'],
+                            Text(widget.post.userName,
                                 style: kLableSize15Black),
-                            Text(postData['timeAgo'], style: kLableSize13Grey),
+                            Text(widget.post.timeAgo!, style: kLableSize13Grey),
                           ],
                         ),
                         Row(
@@ -111,7 +131,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      postData['description'],
+                      widget.post.content,
                       maxLines: isExpanded ? null : 2,
                       overflow: isExpanded
                           ? TextOverflow.visible
@@ -154,9 +174,12 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                     ),
                   const SizedBox(height: 10),
                   // Ảnh bài viết
-                  Center(
-                      child: Image.network(postData['imageUrl'],
-                          fit: BoxFit.cover)),
+
+                  widget.post.imageUrl != null
+                      ? Center(
+                          child: Image.network(postData['imageUrl'],
+                              fit: BoxFit.cover))
+                      : const SizedBox.shrink(),
                   // Like, Comment, Share
                   Padding(
                     padding: const EdgeInsets.all(10),
@@ -170,7 +193,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                                 child:
                                     SvgPicture.asset('assets/svgs/heart.svg')),
                             const SizedBox(width: 5),
-                            Text(postData['likes'].toString(),
+                            Text(widget.post.likeCount.toString(),
                                 style: kLableSize13Black),
                           ],
                         ),
@@ -178,7 +201,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                           children: [
                             SvgPicture.asset('assets/svgs/comment.svg'),
                             const SizedBox(width: 5),
-                            Text(postData['comments'].toString(),
+                            Text(widget.post.commentCount.toString(),
                                 style: kLableSize13Black),
                           ],
                         ),
@@ -189,8 +212,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                                 child:
                                     SvgPicture.asset('assets/svgs/send.svg')),
                             const SizedBox(width: 5),
-                            Text(postData['shares'].toString(),
-                                style: kLableSize13Black),
+                            Text('1', style: kLableSize13Black),
                           ],
                         ),
                       ],
@@ -198,26 +220,33 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                   ),
                   const Divider(),
                   // Danh sách bình luận
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: commentsData
-                          .map((comment) => _buildComment(comment))
-                          .toList(),
+                  Obx(
+                    () => Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: _commentController.loadedComment
+                            .where((comment) => comment.parentCommentId == null)
+                            .map((comment) => _buildComment(comment))
+                            .toList(),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          _buildCommentInput()
+          _buildCommentInput(),
         ],
       ),
     );
   }
 
   // Hàm xây dựng một bình luận
-  Widget _buildComment(Map<String, dynamic> comment) {
+  Widget _buildComment(Comment comment) {
+    List<Comment> replies = _commentController.loadedComment
+        .where((reply) => reply.parentCommentId == comment.commentId)
+        .toList(); // Lỗi>
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(
@@ -228,7 +257,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(comment['avatarUrl']),
+                backgroundImage: NetworkImage(comment.avatarUrl!),
                 radius: 20,
               ),
               const SizedBox(width: 10),
@@ -237,10 +266,10 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      comment['username'],
+                      comment.userName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(comment['comment']),
+                    Text(comment.content),
                   ],
                 ),
               ),
@@ -253,7 +282,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
               children: [
                 // Hiển thị thời gian
                 Text(
-                  comment['timeAgo'] ?? '',
+                  comment.timeAgo ?? '',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -261,15 +290,16 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                 ),
                 const SizedBox(width: 30),
 
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      replyTo = comment['username'];
-                    });
-                    debugPrint("Phản hồi bình luận của ${comment['username']}");
-                  },
-                  child: Text("Phản hồi", style: kLableSize13Grey),
-                ),
+                comment.parentCommentId == null
+                    ? GestureDetector(
+                        onTap: () {
+                          // Xử lý sự kiện nhấn nút "Phản hồi"
+                          debugPrint(
+                              "Phản hồi bình luận của ${comment.userName}");
+                        },
+                        child: Text("Phản hồi", style: kLableSize13Grey),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -278,13 +308,12 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             color: AppColors.greyIron,
           ),
           // Bình luận con
-          if (comment['children'] != null && comment['children'].isNotEmpty)
+          if (replies.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 50, top: 5),
               child: Column(
-                children: (comment['children'] as List)
-                    .map((child) => _buildComment(child))
-                    .toList(),
+                children:
+                    (replies).map((child) => _buildComment(child)).toList(),
               ),
             ),
         ],

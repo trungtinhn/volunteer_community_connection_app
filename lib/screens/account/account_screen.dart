@@ -95,18 +95,20 @@ class _AccountScreenState extends State<AccountScreen> {
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
                   var post = posts[index];
-                  return PostCard(
-                    username: post['username'],
-                    timeAgo: post['timeAgo'],
-                    description: post['description'],
-                    imageUrl: post['imageUrl'],
-                    likes: post['likes'],
-                    comments: post['comments'],
-                    shares: post['shares'],
-                    onTap: () {
-                      Get.to(() => const DetailPostScreen());
-                    },
-                  );
+                  // return PostCard(
+                  //   username: post['username'],
+                  //   timeAgo: post['timeAgo'],
+                  //   description: post['description'],
+                  //   imageUrl: post['imageUrl'],
+                  //   likes: post['likes'],
+                  //   comments: post['comments'],
+                  //   shares: post['shares'],
+                  //   onTap: () {
+                  //     Get.to(() => const DetailPostScreen());
+                  //   },
+                  // );
+
+                  return SizedBox();
                 },
               ),
             ],
