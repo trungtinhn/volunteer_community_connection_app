@@ -6,13 +6,14 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 
 class InputImage extends StatefulWidget {
   final String label;
+  final bool required;
   final Function(File?) onImagePicked;
 
-  const InputImage({
-    super.key,
-    required this.label,
-    required this.onImagePicked,
-  });
+  const InputImage(
+      {super.key,
+      required this.label,
+      required this.onImagePicked,
+      required this.required});
 
   @override
   State<InputImage> createState() => _InputImageState();
@@ -48,10 +49,12 @@ class _InputImageState extends State<InputImage> {
                 widget.label,
                 style: kLableSize15Black,
               ),
-              const Text(
-                '*',
-                style: TextStyle(color: Colors.red),
-              ),
+              widget.required
+                  ? const Text(
+                      '*',
+                      style: TextStyle(color: Colors.red),
+                    )
+                  : const Text(''),
             ],
           ),
           const SizedBox(height: 8),

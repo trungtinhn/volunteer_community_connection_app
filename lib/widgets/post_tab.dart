@@ -5,11 +5,13 @@ import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
+import 'package:volunteer_community_connection_app/models/community.dart';
 import 'package:volunteer_community_connection_app/screens/home/create_post_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
 class PostTab extends StatefulWidget {
-  const PostTab({super.key});
+  final Community community;
+  const PostTab({super.key, required this.community});
 
   @override
   State<PostTab> createState() => PostTabState();
@@ -70,7 +72,9 @@ class PostTabState extends State<PostTab> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const CreatePostScreen(),
+                      builder: (context) => CreatePostScreen(
+                        community: widget.community,
+                      ),
                     ),
                   );
                 },

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/repositories/post_repository.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -24,5 +26,9 @@ class PostController extends GetxController {
 
   Future<void> setEmptyPosts() async {
     loadedPosts.value = <Post>[];
+  }
+
+  Future<bool> createPost(Map<String, String> postData, File? image) {
+    return _postRepository.createPost(postData, image);
   }
 }

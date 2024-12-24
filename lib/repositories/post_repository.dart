@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:volunteer_community_connection_app/models/post.dart';
 
 import '../services/api_service.dart';
@@ -9,5 +11,16 @@ class PostRepository {
     final data = await _apiService
         .getAll('/api/Post/get-posts-by-community/$communityId');
     return List<Post>.from(data.map((e) => Post.fromJson(e)));
+  }
+
+  Future<bool> createPost(Map<String, String> postData, File? image) async {
+    var result =
+        await _apiService.createFormDataWithImage('/api/Post', postData, image);
+
+    if (result != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -12,6 +17,8 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
+
   final List<Map<String, dynamic>> posts = [
     {
       'username': 'Bruno Pham',
@@ -34,6 +41,35 @@ class _AccountScreenState extends State<AccountScreen> {
       'shares': 12,
     },
   ];
+
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print("Image picker error: $e");
+    }
+  }
+
+  void _changeAvatar() async {
+    await _pickImage(ImageSource.gallery);
+    if (_selectedImage != null) {
+      var user = await _usercontroller.changeAvatar(
+          _usercontroller.getCurrentUser()!.userId, _selectedImage!);
+      if (user != null) {
+        _usercontroller.setCurrentUser(user);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,11 +79,41 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Column(
             children: [
               // Ảnh đại diện
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150',
-                ),
+              Stack(
+                children: [
+                  Obx(
+                    () => CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _usercontroller
+                                  .getCurrentUser()!
+                                  .avatarUrl !=
+                              null
+                          ? NetworkImage(
+                              _usercontroller.getCurrentUser()!.avatarUrl!,
+                            )
+                          : const AssetImage('assets/images/default_avatar.jpg')
+                              as ImageProvider,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        _changeAvatar();
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                            color: AppColors.darkBlue, shape: BoxShape.circle),
+                        child: SvgPicture.asset('assets/icons/camera.svg'),
+                      ),
+                    ),
+                  )
+                ],
               ),
               const SizedBox(height: 10),
 

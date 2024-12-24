@@ -45,7 +45,18 @@ class _PostCardState extends State<PostCard> {
                               ),
                               shape: BoxShape.circle),
                         )
-                      : const SizedBox.shrink(),
+                      : Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: AssetImage(
+                                  'assets/images/default_avatar.jpg'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +113,12 @@ class _PostCardState extends State<PostCard> {
               ),
             const SizedBox(height: 10),
             widget.post.imageUrl != null
-                ? Image.asset(widget.post.imageUrl!, fit: BoxFit.cover)
+                ? Container(
+                    height: 200,
+                    width: double.infinity,
+                    child:
+                        Image.network(widget.post.imageUrl!, fit: BoxFit.cover),
+                  )
                 : const SizedBox.shrink(),
             Padding(
               padding: const EdgeInsets.all(10),

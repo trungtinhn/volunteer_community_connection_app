@@ -9,6 +9,8 @@ import 'package:volunteer_community_connection_app/screens/donate/donation_scree
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
 
+import '../../models/community.dart';
+
 class DetailsDonationScreen extends StatefulWidget {
   const DetailsDonationScreen({super.key});
 
@@ -33,6 +35,23 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
   int _selectedTabIndex = 0;
 
   int communityId = 1;
+
+  Community community = Community(
+      communityId: 1,
+      communityName: 'Community 1',
+      description: 'Description 1',
+      imageUrl: 'assets/images/covid_relief.jpg',
+      isPublished: true,
+      targetAmount: 20000,
+      currentAmount: 10000,
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+      type: 'Quyên góp đồ vật',
+      createDate: DateTime.now(),
+      adminId: 1,
+      donationCount: 5,
+      longtitude: 0.0,
+      latitude: 0.0);
 
   final PostController _postController = Get.put(PostController());
 
@@ -222,7 +241,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
               ),
             ),
             Container(
-              height: 1300,
+              height: double.maxFinite,
               color: AppColors.whitePorcelain,
               child: Column(
                 children: [
@@ -260,12 +279,13 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                   const SizedBox(
                     height: 8,
                   ),
-                  SizedBox(
-                    height: 1200,
+                  Expanded(
                     child: TabBarView(
                       controller: _tabController,
-                      children: const [
-                        PostTab(),
+                      children: [
+                        PostTab(
+                          community: community,
+                        ),
                         DonorTab(),
                       ],
                     ),
