@@ -102,6 +102,7 @@ class PostTabState extends State<PostTab> {
                 var post = _postController.loadedPosts[index];
                 return PostCard(
                   post: post,
+                  showCommunity: false,
                   onTap: () {
                     Navigator.push(
                       context,

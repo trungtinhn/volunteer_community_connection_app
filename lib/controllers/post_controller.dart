@@ -13,9 +13,20 @@ class PostController extends GetxController {
   final PostRepository _postRepository = PostRepository();
 
   RxList<Post> loadedPosts = <Post>[].obs;
+  RxList<Post> myPosts = <Post>[].obs;
 
   Future<List<Post>> getPostsByCommunity(int communityId) async {
     var posts = await _postRepository.getPostsByCommunity(communityId);
+
+    for (var post in posts) {
+      post.timeAgo = timeago.format(post.createDate, locale: 'vi');
+    }
+
+    return posts;
+  }
+
+  Future<List<Post>> getPostsByUser(int userId) async {
+    var posts = await _postRepository.getPostByUser(userId);
 
     for (var post in posts) {
       post.timeAgo = timeago.format(post.createDate, locale: 'vi');

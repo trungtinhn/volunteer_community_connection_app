@@ -135,15 +135,14 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 15,
-                              color: AppColors.blue,
+                            Icon(
+                              Icons.arrow_right,
+                              color: AppColors.buleJeans,
                             ),
-                            Text('Hỗ trợ bão cho đồng bào',
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: kLableSize15Bluew600),
+                            Text(
+                              '${widget.post.communityName}',
+                              style: kLableSize15Bluew600,
+                            )
                           ],
                         ),
                       ],
@@ -278,10 +277,10 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundImage: comment.avatarUrl == null
-                    ? const AssetImage('assets/images/default_avatar.jpg')
-                        as ImageProvider
-                    : NetworkImage(comment.avatarUrl!),
+                backgroundImage: comment.avatarUrl != null
+                    ? NetworkImage(comment.avatarUrl!)
+                    : const AssetImage('assets/images/default_avatar.jpg')
+                        as ImageProvider<Object>,
                 radius: 20,
               ),
               const SizedBox(width: 10),

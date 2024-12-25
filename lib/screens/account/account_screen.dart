@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
+import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
@@ -18,6 +19,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   final Usercontroller _usercontroller = Get.put(Usercontroller());
+  final PostController _postController = Get.put(PostController());
 
   final List<Map<String, dynamic>> posts = [
     {
@@ -41,6 +43,13 @@ class _AccountScreenState extends State<AccountScreen> {
       'shares': 12,
     },
   ];
+
+  Future<void> _fetchMyPosts() async {
+    _postController.myPosts.clear();
+    _postController.myPosts.value = await _postController.getPostsByUser(
+      _usercontroller.getCurrentUser()!.userId,
+    );
+  }
 
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
@@ -68,6 +77,13 @@ class _AccountScreenState extends State<AccountScreen> {
         _usercontroller.setCurrentUser(user);
       }
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchMyPosts();
   }
 
   @override
@@ -155,28 +171,25 @@ class _AccountScreenState extends State<AccountScreen> {
                   _buildActionButton(Icons.email, Colors.blue),
                 ],
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  var post = posts[index];
-                  // return PostCard(
-                  //   username: post['username'],
-                  //   timeAgo: post['timeAgo'],
-                  //   description: post['description'],
-                  //   imageUrl: post['imageUrl'],
-                  //   likes: post['likes'],
-                  //   comments: post['comments'],
-                  //   shares: post['shares'],
-                  //   onTap: () {
-                  //     Get.to(() => const DetailPostScreen());
-                  //   },
-                  // );
-
-                  return SizedBox();
-                },
-              ),
+              Obx(
+                () => ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _postController.myPosts.length,
+                  itemBuilder: (context, index) {
+                    var post = _postController.myPosts[index];
+                    return PostCard(
+                      post: post,
+                      showCommunity: true,
+                      onTap: () {
+                        Get.to(() => DetailPostScreen(
+                              post: post,
+                            ));
+                      },
+                    );
+                  },
+                ),
+              )
             ],
           ),
         ),

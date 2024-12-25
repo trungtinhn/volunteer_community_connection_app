@@ -286,7 +286,9 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                         PostTab(
                           community: community,
                         ),
-                        DonorTab(),
+                        DonorTab(
+                          community: community,
+                        ),
                       ],
                     ),
                   ),

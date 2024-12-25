@@ -6,9 +6,14 @@ import 'package:volunteer_community_connection_app/models/post.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
+  final bool showCommunity;
   final VoidCallback onTap;
 
-  const PostCard({super.key, required this.post, required this.onTap});
+  const PostCard(
+      {super.key,
+      required this.post,
+      required this.onTap,
+      required this.showCommunity});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -34,34 +39,34 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  widget.post.avatarUrl != null
-                      ? Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(widget.post.avatarUrl!),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle),
-                        )
-                      : Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/default_avatar.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                  CircleAvatar(
+                    backgroundImage: widget.post.avatarUrl != null
+                        ? NetworkImage(widget.post.avatarUrl!)
+                        : const AssetImage('assets/images/default_avatar.jpg')
+                            as ImageProvider<Object>,
+                    radius: 25,
+                  ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.post.userName, style: kLableSize15Black),
+                      Row(
+                        children: [
+                          Text(widget.post.userName, style: kLableSize15Black),
+                          widget.showCommunity
+                              ? Icon(
+                                  Icons.arrow_right,
+                                  color: AppColors.buleJeans,
+                                )
+                              : const Text(''),
+                          widget.showCommunity
+                              ? Text(
+                                  '${widget.post.communityName}',
+                                  style: kLableSize15Bluew600,
+                                )
+                              : const Text('')
+                        ],
+                      ),
                       Text(widget.post.timeAgo!, style: kLableSize13Grey),
                     ],
                   ),
