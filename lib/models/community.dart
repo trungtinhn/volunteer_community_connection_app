@@ -50,7 +50,31 @@ class Community {
             : json['currentAmount'],
         donationCount: json['donationCount'] as int,
         type: json['type'] as String,
-        longtitude: json['longtitude'],
+        longtitude: json['longitude'],
         latitude: json['latitude']);
+  }
+
+  // Hàm kiểm tra trạng thái của dự ánn
+  String checkStatus() {
+    final now = DateTime.now();
+
+    if (!isPublished) {
+      return 'Đang chờ duyệt';
+    }
+
+    if (now.isBefore(startDate)) {
+      return 'Sắp diễn ra';
+    } else if (now.isAfter(startDate) && now.isBefore(endDate)) {
+      if (targetAmount != null && currentAmount >= targetAmount!) {
+        return 'Hoàn thành mục tiêu';
+      }
+      return 'Đang diễn ra';
+    } else if (now.isAfter(endDate)) {
+      if (targetAmount != null && currentAmount >= targetAmount!) {
+        return 'Kết thúc thành công';
+      }
+      return 'Kết thúc nhưng không đạt mục tiêu';
+    }
+    return 'Trạng thái không xác định';
   }
 }
