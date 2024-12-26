@@ -7,6 +7,8 @@ class User {
   final String role;
   final DateTime dayOfBirth;
   final String? token;
+  final int countDonate;
+  final int countPosts;
 
   User(
       {required this.userId,
@@ -16,19 +18,22 @@ class User {
       required this.avatarUrl,
       required this.role,
       required this.dayOfBirth,
+      required this.countDonate,
+      required this.countPosts,
       this.token});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      userId: json['userId'] ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? '',
-      avatarUrl: json['avatarUrl'] ?? null,
-      role: json['role'] ?? '',
-      token: json['token'] ?? '',
-      dayOfBirth: DateTime.parse(json['dayOfBirth'] ?? ''),
-    );
+        userId: json['userId'] ?? 0,
+        name: json['name'] ?? '',
+        email: json['email'] ?? '',
+        phoneNumber: json['phoneNumber'] ?? '',
+        avatarUrl: json['avatarUrl'] ?? null,
+        role: json['role'] ?? '',
+        token: json['token'] ?? '',
+        dayOfBirth: DateTime.parse(json['dayOfBirth'] ?? ''),
+        countDonate: json['countDonate'] ?? 0,
+        countPosts: json['countPosts'] ?? 0);
   }
 
   Map<String, dynamic> toJson() {
@@ -41,6 +46,8 @@ class User {
       'role': role,
       'token': token,
       'dayOfBirth': dayOfBirth.toIso8601String(),
+      'countDonate': countDonate,
+      'countPosts': countPosts
     };
   }
 }

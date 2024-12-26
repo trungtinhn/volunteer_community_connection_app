@@ -31,4 +31,9 @@ class Usercontroller extends GetxController {
     var user = await _userRepository.changeAvatar(userId, avatar);
     return user;
   }
+
+  Future<User?> getUser(int userId) async {
+    var user = await _userRepository.getUser(userId);
+    return user;
+  }
 }

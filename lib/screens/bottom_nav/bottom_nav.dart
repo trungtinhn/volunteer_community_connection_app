@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/models/nav.dart';
 import 'package:volunteer_community_connection_app/screens/account/account_screen.dart';
@@ -7,6 +8,8 @@ import 'package:volunteer_community_connection_app/screens/bottom_nav/nav_bar.da
 import 'package:volunteer_community_connection_app/screens/home/create_project_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/home_screen.dart';
 import 'package:volunteer_community_connection_app/screens/notification/notification_screen.dart';
+
+import '../../controllers/user_controller.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
@@ -22,6 +25,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   final accountKey = GlobalKey<NavigatorState>();
   int selectedTab = 0;
   List<NavModel> items = [];
+
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
 
   @override
   void initState() {
@@ -41,7 +46,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
         navKey: notificationKey,
       ),
       NavModel(
-        page: const AccountScreen(),
+        page: AccountScreen(user: _usercontroller.getCurrentUser()!),
         navKey: accountKey,
       ),
     ];
