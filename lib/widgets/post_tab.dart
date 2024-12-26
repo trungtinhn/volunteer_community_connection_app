@@ -4,12 +4,16 @@ import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/like_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/models/community.dart';
 import 'package:volunteer_community_connection_app/screens/home/create_post_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
 class PostTab extends StatefulWidget {
-  const PostTab({super.key});
+  final Community community;
+  const PostTab({super.key, required this.community});
 
   @override
   State<PostTab> createState() => PostTabState();
@@ -41,6 +45,16 @@ class PostTabState extends State<PostTab> {
   ];
 
   final PostController _postController = Get.put(PostController());
+  final LikeController _likeController = Get.put(LikeController());
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
+
+  Future<void> likePost(int postId) async {
+    await _likeController.likePost(
+        _usercontroller.getCurrentUser()!.userId, postId);
+    var post = await _postController.getPost(
+        postId, _usercontroller.getCurrentUser()!.userId);
+    await _postController.updateLoadedPosts(post);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +84,9 @@ class PostTabState extends State<PostTab> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const CreatePostScreen(),
+                      builder: (context) => CreatePostScreen(
+                        community: widget.community,
+                      ),
                     ),
                   );
                 },
@@ -97,7 +113,11 @@ class PostTabState extends State<PostTab> {
               itemBuilder: (context, index) {
                 var post = _postController.loadedPosts[index];
                 return PostCard(
+                  onTapLike: () {
+                    likePost(post.postId);
+                  },
                   post: post,
+                  showCommunity: false,
                   onTap: () {
                     Navigator.push(
                       context,

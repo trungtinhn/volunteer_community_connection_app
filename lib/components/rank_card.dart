@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 
 class RankCard extends StatelessWidget {
   final int rank;
-  final String avatar;
+  final String? avatar;
   final String name;
-  final String amount;
+  final double amount;
   final bool isEven;
 
   const RankCard({
@@ -20,6 +21,11 @@ class RankCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final numberFormat = NumberFormat('#,###');
+
+    int amountInt = amount.toInt();
+    String formattedAmount = numberFormat.format(amountInt);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -41,7 +47,11 @@ class RankCard extends StatelessWidget {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
                 image: DecorationImage(
-                    image: AssetImage(avatar), fit: BoxFit.cover)),
+                    image: avatar != null
+                        ? NetworkImage(avatar!)
+                        : const AssetImage('assets/images/default_avatar.jpg')
+                            as ImageProvider<Object>,
+                    fit: BoxFit.cover)),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -51,7 +61,7 @@ class RankCard extends StatelessWidget {
             ),
           ),
           Text(
-            amount,
+            "$formattedAmountđ",
             style: kLableSize15Black,
           ),
         ],

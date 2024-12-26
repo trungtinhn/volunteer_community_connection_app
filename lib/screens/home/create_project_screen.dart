@@ -230,6 +230,7 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
               children: [
                 InputImage(
                   label: 'Ảnh minh họa',
+                  required: true,
                   onImagePicked: (File? image) {
                     selectedImage = image;
                   },

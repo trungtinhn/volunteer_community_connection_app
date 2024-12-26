@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // ignore: constant_identifier_names
-  static const String API_URL = 'https://b088-14-169-90-28.ngrok-free.app';
-
+  static const String API_URL = 'https://1ca4-14-169-90-91.ngrok-free.app';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(
@@ -40,6 +39,33 @@ class ApiService {
     if (image != null) {
       request.files.add(await http.MultipartFile.fromPath(
         'image',
+        image.path,
+      ));
+    }
+
+    try {
+      final response = await request.send();
+      final responseData = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(responseData.body);
+      } else {
+        throw Exception(
+            'Failed POST request: ${response.statusCode}, ${responseData.body}');
+      }
+    } catch (e) {
+      throw Exception('POST error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> changeAvatar(
+      String endpoint, File? image) async {
+    final url = Uri.parse('$API_URL$endpoint');
+
+    var request = http.MultipartRequest('PUT', url);
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'avatar',
         image.path,
       ));
     }

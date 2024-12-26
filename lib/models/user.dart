@@ -3,7 +3,7 @@ class User {
   final String name;
   final String email;
   final String phoneNumber;
-  final String avatarUrl;
+  final String? avatarUrl;
   final String role;
   final DateTime dayOfBirth;
   final String? token;
@@ -24,7 +24,7 @@ class User {
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
-      avatarUrl: json['avatarUrl'] ?? '',
+      avatarUrl: json['avatarUrl'] ?? null,
       role: json['role'] ?? '',
       token: json['token'] ?? '',
       dayOfBirth: DateTime.parse(json['dayOfBirth'] ?? ''),

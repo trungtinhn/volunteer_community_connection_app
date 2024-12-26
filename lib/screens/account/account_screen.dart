@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
+import 'package:volunteer_community_connection_app/controllers/like_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -12,6 +19,10 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
+  final PostController _postController = Get.put(PostController());
+  final LikeController _likeController = Get.put(LikeController());
+
   final List<Map<String, dynamic>> posts = [
     {
       'username': 'Bruno Pham',
@@ -34,6 +45,58 @@ class _AccountScreenState extends State<AccountScreen> {
       'shares': 12,
     },
   ];
+
+  Future<void> _fetchMyPosts() async {
+    _postController.myPosts.clear();
+    _postController.myPosts.value = await _postController.getPostsByUser(
+      _usercontroller.getCurrentUser()!.userId,
+      _usercontroller.getCurrentUser()!.userId,
+    );
+  }
+
+  Future<void> likePost(int postId) async {
+    await _likeController.likePost(
+        _usercontroller.getCurrentUser()!.userId, postId);
+    var post = await _postController.getPost(
+        postId, _usercontroller.getCurrentUser()!.userId);
+    await _postController.updateLoadedPosts(post);
+  }
+
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print("Image picker error: $e");
+    }
+  }
+
+  void _changeAvatar() async {
+    await _pickImage(ImageSource.gallery);
+    if (_selectedImage != null) {
+      var user = await _usercontroller.changeAvatar(
+          _usercontroller.getCurrentUser()!.userId, _selectedImage!);
+      if (user != null) {
+        _usercontroller.setCurrentUser(user);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchMyPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,11 +106,41 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Column(
             children: [
               // Ảnh đại diện
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150',
-                ),
+              Stack(
+                children: [
+                  Obx(
+                    () => CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _usercontroller
+                                  .getCurrentUser()!
+                                  .avatarUrl !=
+                              null
+                          ? NetworkImage(
+                              _usercontroller.getCurrentUser()!.avatarUrl!,
+                            )
+                          : const AssetImage('assets/images/default_avatar.jpg')
+                              as ImageProvider,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        _changeAvatar();
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                            color: AppColors.darkBlue, shape: BoxShape.circle),
+                        child: SvgPicture.asset('assets/icons/camera.svg'),
+                      ),
+                    ),
+                  )
+                ],
               ),
               const SizedBox(height: 10),
 
@@ -89,28 +182,28 @@ class _AccountScreenState extends State<AccountScreen> {
                   _buildActionButton(Icons.email, Colors.blue),
                 ],
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  var post = posts[index];
-                  // return PostCard(
-                  //   username: post['username'],
-                  //   timeAgo: post['timeAgo'],
-                  //   description: post['description'],
-                  //   imageUrl: post['imageUrl'],
-                  //   likes: post['likes'],
-                  //   comments: post['comments'],
-                  //   shares: post['shares'],
-                  //   onTap: () {
-                  //     Get.to(() => const DetailPostScreen());
-                  //   },
-                  // );
-
-                  return SizedBox();
-                },
-              ),
+              Obx(
+                () => ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _postController.myPosts.length,
+                  itemBuilder: (context, index) {
+                    var post = _postController.myPosts[index];
+                    return PostCard(
+                      onTapLike: () {
+                        likePost(post.postId);
+                      },
+                      post: post,
+                      showCommunity: true,
+                      onTap: () {
+                        Get.to(() => DetailPostScreen(
+                              post: post,
+                            ));
+                      },
+                    );
+                  },
+                ),
+              )
             ],
           ),
         ),
