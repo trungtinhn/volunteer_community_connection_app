@@ -7,16 +7,21 @@ import '../services/api_service.dart';
 class PostRepository {
   final ApiService _apiService = ApiService();
 
-  Future<List<Post>> getPostsByCommunity(int communityId) async {
+  Future<List<Post>> getPostsByCommunity(int communityId, int userId) async {
     final data = await _apiService
-        .getAll('/api/Post/get-posts-by-community/$communityId');
+        .getAll('/api/Post/get-posts-by-community/$communityId/$userId');
     return List<Post>.from(data.map((e) => Post.fromJson(e)));
   }
 
-  Future<List<Post>> getPostByUser(int userId) async {
+  Future<List<Post>> getPostByUser(int userId, int myId) async {
     final data =
-        await _apiService.getAll('/api/Post/get-posts-by-user/$userId');
+        await _apiService.getAll('/api/Post/get-posts-by-user/$userId/$myId');
     return List<Post>.from(data.map((e) => Post.fromJson(e)));
+  }
+
+  Future<Post> getPost(int postId, int userId) async {
+    final data = await _apiService.get('/api/Post/$postId/$userId');
+    return Post.fromJson(data);
   }
 
   Future<bool> createPost(Map<String, String> postData, File? image) async {

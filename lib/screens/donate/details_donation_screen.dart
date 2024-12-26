@@ -5,6 +5,7 @@ import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/donate/donation_screen.dart';
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
@@ -54,6 +55,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
       latitude: 0.0);
 
   final PostController _postController = Get.put(PostController());
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
 
   @override
   void initState() {
@@ -79,7 +81,8 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   Future<void> loadPosts() async {
     _postController.loadedPosts.value =
-        await _postController.getPostsByCommunity(communityId);
+        await _postController.getPostsByCommunity(
+            communityId, _usercontroller.getCurrentUser()!.userId);
   }
 
   Color _getStatusBackgroundColor(String status) {

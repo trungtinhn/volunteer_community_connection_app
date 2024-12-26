@@ -11,7 +11,7 @@ class Post {
   final String userName;
   final String? avatarUrl;
   final String communityName;
-  bool isLiked = false;
+  final bool isLiked;
   late String? timeAgo;
 
   Post(
@@ -26,7 +26,8 @@ class Post {
       required this.commentCount,
       required this.userName,
       required this.avatarUrl,
-      required this.communityName});
+      required this.communityName,
+      required this.isLiked});
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
@@ -42,6 +43,7 @@ class Post {
       userName: json['userName'],
       avatarUrl: json['avatarUrl'],
       communityName: json['communityName'],
+      isLiked: json['isLiked'],
     );
   }
 
@@ -59,7 +61,7 @@ class Post {
       'isLiked': isLiked,
       'userName': userName,
       'avatarUrl': avatarUrl,
-      'communityName': communityName
+      'communityName': communityName,
     };
   }
 }

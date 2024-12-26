@@ -8,12 +8,15 @@ class PostCard extends StatefulWidget {
   final Post post;
   final bool showCommunity;
   final VoidCallback onTap;
+  final VoidCallback onTapLike;
 
-  const PostCard(
-      {super.key,
-      required this.post,
-      required this.onTap,
-      required this.showCommunity});
+  const PostCard({
+    super.key,
+    required this.post,
+    required this.onTap,
+    required this.showCommunity,
+    required this.onTapLike,
+  });
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -130,15 +133,20 @@ class _PostCardState extends State<PostCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/svgs/heart.svg'),
-                      const SizedBox(width: 5),
-                      Text(
-                        widget.post.likeCount.toString(),
-                        style: kLableSize13Black,
-                      ),
-                    ],
+                  InkWell(
+                    onTap: widget.onTapLike,
+                    child: Row(
+                      children: [
+                        widget.post.isLiked
+                            ? SvgPicture.asset('assets/svgs/heart_fill.svg')
+                            : SvgPicture.asset('assets/svgs/heart.svg'),
+                        const SizedBox(width: 5),
+                        Text(
+                          widget.post.likeCount.toString(),
+                          style: kLableSize13Black,
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [

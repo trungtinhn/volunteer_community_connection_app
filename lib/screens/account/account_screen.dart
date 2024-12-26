@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:volunteer_community_connection_app/components/post_card.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
+import 'package:volunteer_community_connection_app/controllers/like_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
@@ -20,6 +21,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   final Usercontroller _usercontroller = Get.put(Usercontroller());
   final PostController _postController = Get.put(PostController());
+  final LikeController _likeController = Get.put(LikeController());
 
   final List<Map<String, dynamic>> posts = [
     {
@@ -48,7 +50,16 @@ class _AccountScreenState extends State<AccountScreen> {
     _postController.myPosts.clear();
     _postController.myPosts.value = await _postController.getPostsByUser(
       _usercontroller.getCurrentUser()!.userId,
+      _usercontroller.getCurrentUser()!.userId,
     );
+  }
+
+  Future<void> likePost(int postId) async {
+    await _likeController.likePost(
+        _usercontroller.getCurrentUser()!.userId, postId);
+    var post = await _postController.getPost(
+        postId, _usercontroller.getCurrentUser()!.userId);
+    await _postController.updateLoadedPosts(post);
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -179,6 +190,9 @@ class _AccountScreenState extends State<AccountScreen> {
                   itemBuilder: (context, index) {
                     var post = _postController.myPosts[index];
                     return PostCard(
+                      onTapLike: () {
+                        likePost(post.postId);
+                      },
                       post: post,
                       showCommunity: true,
                       onTap: () {

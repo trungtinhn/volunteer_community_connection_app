@@ -15,8 +15,16 @@ class PostController extends GetxController {
   RxList<Post> loadedPosts = <Post>[].obs;
   RxList<Post> myPosts = <Post>[].obs;
 
-  Future<List<Post>> getPostsByCommunity(int communityId) async {
-    var posts = await _postRepository.getPostsByCommunity(communityId);
+  Future<void> updateLoadedPosts(Post post) async {
+    int index =
+        loadedPosts.indexWhere((element) => element.postId == post.postId);
+    if (index != -1) {
+      loadedPosts[index] = post;
+    }
+  }
+
+  Future<List<Post>> getPostsByCommunity(int communityId, int userId) async {
+    var posts = await _postRepository.getPostsByCommunity(communityId, userId);
 
     for (var post in posts) {
       post.timeAgo = timeago.format(post.createDate, locale: 'vi');
@@ -25,14 +33,22 @@ class PostController extends GetxController {
     return posts;
   }
 
-  Future<List<Post>> getPostsByUser(int userId) async {
-    var posts = await _postRepository.getPostByUser(userId);
+  Future<List<Post>> getPostsByUser(int userId, int myId) async {
+    var posts = await _postRepository.getPostByUser(userId, myId);
 
     for (var post in posts) {
       post.timeAgo = timeago.format(post.createDate, locale: 'vi');
     }
 
     return posts;
+  }
+
+  Future<Post> getPost(int postId, int userId) async {
+    var post = await _postRepository.getPost(postId, userId);
+
+    post.timeAgo = timeago.format(post.createDate, locale: 'vi');
+
+    return post;
   }
 
   Future<void> setEmptyPosts() async {

@@ -48,7 +48,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       var result = await _postController.createPost(postData, selectedImage);
       if (result) {
         _showMessage('Tạo bài đăng thanh cong', isSuccess: true);
-        _postController.getPostsByCommunity(widget.community.communityId);
+        _postController.getPostsByCommunity(widget.community.communityId,
+            _usercontroller.getCurrentUser()!.userId);
         Navigator.pop(context);
       } else {
         _showMessage('Tạo bài đăng that bai', isSuccess: false);
