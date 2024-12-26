@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:uni_links/uni_links.dart';
-import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
+import 'package:volunteer_community_connection_app/controllers/donation_controller.dart';
+import 'package:volunteer_community_connection_app/screens/donate/transfer_notification_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PayDonation extends StatefulWidget {
   final String url;
-  const PayDonation({super.key, required this.url});
+  final int userId;
+  final int communityId;
+  const PayDonation(
+      {super.key,
+      required this.url,
+      required this.userId,
+      required this.communityId});
 
   @override
   State<PayDonation> createState() => _PayDonationState();
@@ -20,6 +27,7 @@ class _PayDonationState extends State<PayDonation> {
   String paymentUrl = '';
   double _progress = 0.0;
   late WebViewController _controller;
+  final DonationController _donationController = Get.put(DonationController());
 
   @override
   void initState() {
@@ -35,7 +43,7 @@ class _PayDonationState extends State<PayDonation> {
             });
           },
           onPageStarted: (String url) {},
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
             if (url.contains('/api/Vnpay/Callback')) {
               final uri = Uri.parse(url);
               final transactionStatus =
@@ -45,15 +53,33 @@ class _PayDonationState extends State<PayDonation> {
                 Get.snackbar(
                   "Giao dịch thành công",
                   "Thanh toán thành công",
-                  snackPosition: SnackPosition.BOTTOM,
+                  snackPosition: SnackPosition.values[0],
                 );
-                Get.to(() => const BottomNavigation());
+
+                final Map<String, String> data = {
+                  'userId': widget.userId.toString(),
+                  'communityId': widget.communityId.toString(),
+                  'amount': uri.queryParameters['vnp_Amount'] ?? '',
+                  'donateDate': DateTime.now().toIso8601String(),
+                };
+
+                await _donationController.addDonation(data);
+
+                Get.to(() => const TransferNotificationScreen(
+                      isSuccess: true,
+                      message: "Cảm ơn bạn đã quyên góp cho cộng đồng!",
+                    ));
               } else {
                 Get.snackbar(
                   "Giao dịch thất bại",
                   "Thanh toán thất bại",
                   snackPosition: SnackPosition.BOTTOM,
                 );
+                Get.to(() => const TransferNotificationScreen(
+                      isSuccess: false,
+                      message:
+                          "Có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.",
+                    ));
               }
             }
           },

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/components/input_number.dart';
 import 'package:volunteer_community_connection_app/components/input_text_multiline.dart';
@@ -31,6 +32,21 @@ class _DonationScreenState extends State<DonationScreen> {
   int amount = 0;
 
   String note = '';
+
+  // Danh sách số tiền mặc định
+  final List<int> predefinedAmounts = [
+    5000,
+    20000,
+    50000,
+    100000,
+    200000,
+    500000
+  ];
+
+  // Hàm kiểm tra số tiền hiện tại có được chọn không
+  bool _isSelectedAmount(int value) => amount == value;
+
+  bool isOtherAmountSelected = false; // Trạng thái chọn "Số tiền khác"
 
   Color _getStatusBackgroundColor(String status) {
     switch (status) {
@@ -143,18 +159,91 @@ class _DonationScreenState extends State<DonationScreen> {
                     'Thông tin quyên góp',
                     style: kLableSize18Black,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
+                  const SizedBox(height: 12),
+                  // Hiển thị các ô chọn số tiền
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      InputNumberField(
-                          label: 'Số tiền',
+                      ...predefinedAmounts.map((value) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              amount = value;
+                              isOtherAmountSelected =
+                                  false; // Bỏ chọn "Số tiền khác"
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: _isSelectedAmount(value)
+                                  ? AppColors.buleJeans
+                                  : AppColors.whitePorcelain,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _isSelectedAmount(value)
+                                    ? AppColors.buleJeans
+                                    : Colors.grey,
+                              ),
+                            ),
+                            child: Text(
+                                NumberFormat.decimalPattern('vi')
+                                    .format(value), // Format số tiền
+                                style: _isSelectedAmount(value)
+                                    ? kLableSize15White
+                                    : kLableSize15Black),
+                          ),
+                        );
+                      }),
+                      // Ô "Số tiền khác"
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            amount = 0; // Xóa số tiền mặc định
+                            isOtherAmountSelected = true; // Chọn "Số tiền khác"
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: isOtherAmountSelected
+                                ? AppColors.buleJeans
+                                : AppColors.whitePorcelain,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isOtherAmountSelected
+                                  ? AppColors.buleJeans
+                                  : Colors.grey,
+                            ),
+                          ),
+                          child: Text('Số tiền khác',
+                              style: isOtherAmountSelected
+                                  ? kLableSize15White
+                                  : kLableSize15Black),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Hiển thị trường nhập số tiền nếu chọn "Số tiền khác"
+                  if (isOtherAmountSelected)
+                    Row(
+                      children: [
+                        InputNumberField(
+                          label: 'Nhập số tiền',
                           name: '',
                           hinttext: '0đ',
                           onChanged: (value) {
-                            amount = int.parse(value);
-                          }),
-                    ],
-                  ),
+                            setState(() {
+                              amount = int.tryParse(value) ?? 0;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -168,28 +257,36 @@ class _DonationScreenState extends State<DonationScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  ButtonBlue(
-                    des: 'Quyên góp',
-                    onPress: () async {
-                      if (amount > 0 && note.isNotEmpty) {
-                        final response = await http.get(
-                          Uri.parse(
-                              '$backendUrl/api/Vnpay/CreatePaymentUrl?money=$amount&description=$note&userId=${_userController.currentUser.value!.userId}&communityId=${community.communityId}'),
-                        );
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ButtonBlue(
+                        des: 'Quyên góp',
+                        onPress: () async {
+                          if (amount > 0 && note.isNotEmpty) {
+                            final response = await http.get(
+                              Uri.parse(
+                                  '$backendUrl/api/Vnpay/CreatePaymentUrl?money=$amount&description=$note'),
+                            );
 
-                        if (response.statusCode == 201) {
-                          var url = response.body;
-                          Get.to(() => PayDonation(
-                                url: url,
-                              ));
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Vui lòng nhập đủ thông tin!")),
-                        );
-                      }
-                    },
+                            if (response.statusCode == 201) {
+                              var url = response.body;
+                              Get.to(() => PayDonation(
+                                    userId: _userController
+                                        .currentUser.value!.userId,
+                                    communityId: community.communityId,
+                                    url: url,
+                                  ));
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Vui lòng nhập đủ thông tin!")),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                 ],

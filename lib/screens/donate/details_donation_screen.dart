@@ -281,7 +281,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                 ),
               ),
               Container(
-                height: 1300,
+                height: double.maxFinite,
                 color: AppColors.whitePorcelain,
                 child: Column(
                   children: [
@@ -310,7 +310,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                           labelStyle: kLableSize15Blue,
                           dividerColor: Colors.white,
                           tabs: [
-                            buildTab(0, 'Bài đăng', 2),
+                            buildTab(0, 'Bài đăng', 1),
                             buildTab(1, 'Nhà hảo tâm', 2),
                           ],
                         ),
@@ -319,31 +319,21 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                     const SizedBox(
                       height: 8,
                     ),
-                    SizedBox(
-                      height: 1200,
+                    Expanded(
                       child: TabBarView(
                         controller: _tabController,
-                        children: const [
-                          PostTab(),
-                          DonorTab(),
+                        children: [
+                          PostTab(
+                            community: community,
+                          ),
+                          DonorTab(
+                            community: community,
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        PostTab(
-                          community: community,
-                        ),
-                        DonorTab(
-                          community: community,
-                        ),
-                      ],
+                    const SizedBox(
+                      height: 25,
                     ),
                   ],
                 ),
