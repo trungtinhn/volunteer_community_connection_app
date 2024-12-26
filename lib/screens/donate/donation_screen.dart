@@ -26,7 +26,7 @@ class _DonationScreenState extends State<DonationScreen> {
       Get.put(CommunityController());
 
   final String backendUrl =
-      'https://1e80-2405-4802-31-5060-697d-d3ba-2126-e634.ngrok-free.app'; // Biến môi trường
+      'https://11d3-2405-4802-31-5060-697d-d3ba-2126-e634.ngrok-free.app'; // Biến môi trường
   bool isExpanded = false;
 
   int amount = 0;
