@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/auth_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/screens/account/login_screen.dart';
 import 'package:volunteer_community_connection_app/screens/chat/chat_screen.dart';
 import 'package:volunteer_community_connection_app/widgets/common_community/coming_soon_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/common_community/end_tab.dart';
@@ -23,6 +26,9 @@ class _HomeScreenState extends State<HomeScreen>
   late TabController _tabController;
   int _selectedTabIndex = 0;
 
+  final Authcontroller _authcontroller = Get.put(Authcontroller());
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +47,13 @@ class _HomeScreenState extends State<HomeScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _logOut() async {
+    await _authcontroller.logout();
+    _usercontroller.removeCurrentUser();
+
+    Get.off(() => const LoginScreen());
   }
 
   @override
@@ -110,7 +123,9 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   child: IconButton(
                       icon: SvgPicture.asset('assets/svgs/send.svg'),
-                      onPressed: () {}),
+                      onPressed: () {
+                        _logOut();
+                      }),
                 ),
               ],
             ),

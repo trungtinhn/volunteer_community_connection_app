@@ -37,4 +37,11 @@ class Authcontroller extends GetxController {
       return false;
     }
   }
+
+  Future<bool> logout() async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.remove('token');
+    _isLoggedIn.value = false;
+    return true;
+  }
 }

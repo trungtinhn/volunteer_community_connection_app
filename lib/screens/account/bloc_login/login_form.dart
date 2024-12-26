@@ -204,6 +204,10 @@ class _LoginFormState extends State<LoginForm> {
                             final email = _usernameController.text;
                             final password = _passwordController.text;
 
+                            setState(() {
+                              _isLoading = true;
+                            });
+
                             bool isLogin =
                                 await authController.login(email, password);
                             if (isLogin) {
@@ -216,6 +220,10 @@ class _LoginFormState extends State<LoginForm> {
                             } else {
                               _showSnackBar();
                             }
+
+                            setState(() {
+                              _isLoading = false;
+                            });
                           },
                           des: 'Login',
                         ),

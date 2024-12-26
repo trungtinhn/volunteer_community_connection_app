@@ -36,4 +36,8 @@ class Usercontroller extends GetxController {
     var user = await _userRepository.getUser(userId);
     return user;
   }
+
+  void removeCurrentUser() {
+    currentUser.value = null;
+  }
 }
