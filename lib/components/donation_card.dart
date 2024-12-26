@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 
@@ -164,10 +163,6 @@ class DonationCard extends StatelessWidget {
                         const SizedBox(height: 16),
                       ],
                     ),
-
-                  if ({'Đang diễn ra'}.contains(status) &&
-                      type == 'Quyên góp tiền')
-                    ButtonBlue(des: 'Quyên góp ngay', onPress: onDonate),
                 ],
               ),
             ),
