@@ -14,6 +14,7 @@ import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/helpers/util.dart';
 
 class CreateProjectScreen extends StatefulWidget {
   const CreateProjectScreen({super.key});
@@ -29,16 +30,23 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
   String selectedProjectType = 'Quyên góp tiền';
   String name = '';
   String description = '';
-  DateTime startDate = DateTime.now();
-  DateTime endDate = DateTime.now().add(const Duration(days: 3));
+  DateTime startDate = DateTime.now().add(const Duration(days: 3));
+  DateTime endDate = DateTime.now().add(const Duration(days: 6));
+  DateTime currentTime = DateTime.now().add(const Duration(days: 2));
   String? targetAmount;
   double? latitude;
   double? longitude;
 
-  void _createProject(BuildContext context) async {
+  bool isLoading = false;
+
+  void _createProject() async {
     // Kiểm tra dữ liệu hợp lệ
     if (name.isEmpty || description.isEmpty) {
       _showMessage('Vui lòng điền đầy đủ thông tin bắt buộc.');
+      return;
+    }
+    if (startDate.isBefore(currentTime)) {
+      _showMessage('Ngày bắt đầu phải sau ngày hôm nay 3 ngày.');
       return;
     }
     if (startDate.isAfter(endDate)) {
@@ -59,12 +67,15 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
       _showMessage('Vui lòng tải lên ảnh minh họa.');
       return;
     }
+    bool isPublished = false;
+
+    if (userController.currentUser.value!.role == 'admin') isPublished = true;
 
     // Chuẩn bị dữ liệu dự án
     final Map<String, String> communityData = {
       "CommunityName": name,
       "Description": description,
-      "IsPublished": "false", // Mặc định là false
+      "IsPublished": isPublished.toString(), // Mặc định là false
       "AdminId": userController.currentUser.value!.userId.toString(),
       "CreateDate": DateTime.now().toIso8601String(),
       "StartDate": startDate.toIso8601String(),
@@ -90,19 +101,20 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
 
   // Hiển thị thông báo
   void _showMessage(String message, {bool isSuccess = false}) {
+    setState(() {
+      isLoading = false;
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: isSuccess ? Colors.green : Colors.red,
       ),
     );
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context);
-    });
-  }
-
-  String formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
+    if (isSuccess) {
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override
@@ -243,7 +255,14 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ButtonBlue(
-                  des: 'Tạo dự án', onPress: () => _createProject(context)),
+                  isLoading: isLoading,
+                  des: 'Tạo dự án',
+                  onPress: () => {
+                        setState(() {
+                          isLoading = true;
+                        }),
+                        _createProject()
+                      }),
             )
           ],
         ),

@@ -2,59 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/donation_card.dart';
 import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
+import 'package:volunteer_community_connection_app/helpers/util.dart';
 import 'package:volunteer_community_connection_app/screens/donate/details_donation_screen.dart';
 
-class EndTab extends StatefulWidget {
-  const EndTab({super.key});
+class ComingSoonTab extends StatefulWidget {
+  const ComingSoonTab({super.key});
 
   @override
-  State<EndTab> createState() => EndTabState();
+  State<ComingSoonTab> createState() => ComingSoonTabState();
 }
 
-class EndTabState extends State<EndTab> {
+class ComingSoonTabState extends State<ComingSoonTab> {
   final CommunityController communityController =
       Get.put(CommunityController());
 
   @override
   void initState() {
     super.initState();
-    communityController.getCommunitiesEnded();
+    communityController.getCommunitiesCommingSoon();
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (communityController.communitiesEnd.value == null) {
+      if (communityController.communitiesComming.value == null) {
         return const Center(child: CircularProgressIndicator());
       }
 
-      if (communityController.communitiesEnd.value!.isEmpty) {
+      if (communityController.communitiesComming.value!.isEmpty) {
         return const Center(
-          child: Text('Hiện tại không có hoạt động nào kết thúc.'),
+          child: Text('Hiện tại không có hoạt động nào sắp diễn ra'),
         );
       }
-      return ListView.builder(
-        itemCount: communityController.communitiesEnd.value!.length,
-        itemBuilder: (context, index) {
-          final data = communityController.communitiesEnd.value![index];
-          double progress = 0.0;
-          if (data.targetAmount != null) {
-            progress = data.currentAmount / data.targetAmount!;
-          }
 
+      return ListView.builder(
+        itemCount: communityController.communitiesComming.value!.length,
+        itemBuilder: (context, index) {
+          final data = communityController.communitiesComming.value![index];
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: DonationCard(
-              status: 'Đã kết thúc',
+              status: data.checkStatus(),
               title: data.communityName,
               type: data.type,
-              progress: progress,
+              description: data.description,
+              startDate: formatDate(data.startDate),
+              endDate: formatDate(data.endDate),
+              progress: 0,
               donationCount: data.donationCount,
               currentAmount: data.currentAmount,
               goalAmount: data.targetAmount ?? 0,
               imageUrl: data.imageUrl,
               onDetails: () {
-                Get.to(() => const DetailsDonationScreen());
+                Get.to(() => DetailsDonationScreen(
+                      communityId: data.communityId,
+                    ));
               },
               onDonate: () {},
             ),

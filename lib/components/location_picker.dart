@@ -51,6 +51,7 @@ class _LocationPickerState extends State<LocationPicker> {
         desiredAccuracy: LocationAccuracy.high,
       );
       _selectedPosition = LatLng(position.latitude, position.longitude);
+      widget.onLocationSelected(_selectedPosition);
       _getAddressFromLatLng(_selectedPosition);
       _mapController.move(_selectedPosition, 18.0); // Di chuyển map
     } catch (e) {
@@ -109,9 +110,12 @@ class _LocationPickerState extends State<LocationPicker> {
           ),
           const SizedBox(height: 10),
           // Hiển thị địa chỉ
-          Text(
-            _address,
-            style: kLableSize15Black,
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              _address,
+              style: kLableSize15Black,
+            ),
           ),
           const SizedBox(height: 10),
           // Bản đồ

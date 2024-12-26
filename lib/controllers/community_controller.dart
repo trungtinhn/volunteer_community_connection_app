@@ -11,7 +11,11 @@ class CommunityController extends GetxController {
 
   final CommunityRepository _communityRepository = CommunityRepository();
 
+  var community = Rx<Community?>(null);
+
   var communities = Rx<List<Community>?>(null);
+
+  var communitiesNoPublic = Rx<List<Community>?>(null);
 
   var communitiesComming = Rx<List<Community>?>(null);
 
@@ -19,12 +23,18 @@ class CommunityController extends GetxController {
 
   var communitiesEnd = Rx<List<Community>?>(null);
 
+  var myCommunities = Rx<List<Community>?>(null);
+
+  var myCommunitiesNoPublic = Rx<List<Community>?>(null);
+
+  var isUpdating = false.obs;
+
   Future<void> getCommunities() async {
     communities.value = await _communityRepository.getCommunities();
   }
 
-  Future<Community> getCommunityById(int id) async {
-    return await _communityRepository.getCommunityById(id);
+  Future<void> getCommunityById(int id) async {
+    community.value = await _communityRepository.getCommunityById(id);
   }
 
   Future<void> getCommunitiesCommingSoon() async {
@@ -43,5 +53,44 @@ class CommunityController extends GetxController {
   Future<void> createCommunityWithImage(
       Map<String, String> communityData, File? image) async {
     await _communityRepository.createCommunityWithImage(communityData, image);
+  }
+
+  Future<void> getCommunitiesNoPublic() async {
+    communitiesNoPublic.value =
+        await _communityRepository.getCommnitiesNoPublic();
+  }
+
+  Future<void> getMyCommunities(int idUser) async {
+    myCommunities.value =
+        await _communityRepository.getCommunitiesByAdminId(idUser);
+  }
+
+  Future<void> getMyCommunitiesNoPublic(int idUser) async {
+    myCommunitiesNoPublic.value =
+        await _communityRepository.getCommunitiesByAdminIdNoPublic(idUser);
+  }
+
+  Future<bool> publishCommunity(int id) async {
+    isUpdating.value = true;
+    try {
+      final result = await _communityRepository.publishCommunity(id);
+      return result; // Trả về true nếu thành công
+    } catch (e) {
+      return false; // Trả về false nếu thất bại
+    } finally {
+      isUpdating.value = false;
+    }
+  }
+
+  Future<bool> unpublishCommunity(int id) async {
+    isUpdating.value = true;
+    try {
+      final result = await _communityRepository.unpublishCommunity(id);
+      return result; // Trả về true nếu thành công
+    } catch (e) {
+      return false; // Trả về false nếu thất bại
+    } finally {
+      isUpdating.value = false;
+    }
   }
 }

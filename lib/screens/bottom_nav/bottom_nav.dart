@@ -5,6 +5,7 @@ import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/models/nav.dart';
 import 'package:volunteer_community_connection_app/screens/account/account_screen.dart';
 import 'package:volunteer_community_connection_app/screens/bottom_nav/nav_bar.dart';
+import 'package:volunteer_community_connection_app/screens/community/community_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/create_project_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/home_screen.dart';
 import 'package:volunteer_community_connection_app/screens/notification/notification_screen.dart';
@@ -38,7 +39,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
         navKey: homeNavKey,
       ),
       NavModel(
-        page: const HomeScreen(),
+        page: const CommunityScreen(),
         navKey: categoryKey,
       ),
       NavModel(
@@ -65,6 +66,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
         body: IndexedStack(
           index: selectedTab,
           children: items

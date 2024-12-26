@@ -2,31 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/chat/chat_screen.dart';
-import 'package:volunteer_community_connection_app/widgets/common_community/coming_soon_tab.dart';
-import 'package:volunteer_community_connection_app/widgets/common_community/end_tab.dart';
-import 'package:volunteer_community_connection_app/widgets/common_community/going_on_tab.dart';
 import 'package:get/get.dart';
+import 'package:volunteer_community_connection_app/widgets/admin_community/community_wait_accept.dart';
+import 'package:volunteer_community_connection_app/widgets/common_community/my_community_tab.dart';
+import 'package:volunteer_community_connection_app/widgets/user_community/my_community_wait_accept.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class CommunityScreen extends StatefulWidget {
+  const CommunityScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _CommunityScreenState extends State<CommunityScreen>
     with SingleTickerProviderStateMixin {
-  final GlobalKey<ComingSoonTabState> tab1Key = GlobalKey<ComingSoonTabState>();
-  final GlobalKey<GoingOnTabState> tab2Key = GlobalKey<GoingOnTabState>();
-  final GlobalKey<EndTabState> tab3Key = GlobalKey<EndTabState>();
   late TabController _tabController;
   int _selectedTabIndex = 0;
+
+  Usercontroller userController = Get.put(Usercontroller());
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.index != _selectedTabIndex) {
@@ -117,24 +117,18 @@ class _HomeScreenState extends State<HomeScreen>
                 labelStyle: kLableSize15BlueDark,
                 dividerColor: Colors.white,
                 tabs: [
-                  buildTab(0, 'Sắp diễn ra', 1),
-                  buildTab(1, 'Đang diễn ra', 2),
-                  buildTab(2, 'Đã kết thúc', 1),
+                  buildTab(0, 'Dự án của bạn', 2),
+                  buildTab(1, 'Đang chờ duyệt', 2),
                 ],
               ),
             ),
           ),
         ),
         body: TabBarView(controller: _tabController, children: [
-          ComingSoonTab(
-            key: tab1Key,
-          ),
-          GoingOnTab(
-            key: tab2Key,
-          ),
-          EndTab(
-            key: tab3Key,
-          )
+          const MyCommunityTab(),
+          userController.currentUser.value!.role == 'admin'
+              ? const CommunityWaitAccept()
+              : const MyCommunityWaitAcceptTab(),
         ]));
   }
 
@@ -148,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
       },
       child: SizedBox(
         height: 36,
-        width: (type == 1 ? 103 : 120),
+        width: (type == 1 ? 103 : 140),
         child: Center(
           child: Text(
             text,

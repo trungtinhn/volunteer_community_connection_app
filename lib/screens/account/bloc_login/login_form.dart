@@ -34,7 +34,6 @@ class _LoginFormState extends State<LoginForm> {
   final Usercontroller usercontroller = Get.put(Usercontroller());
 
   @override
-
   Widget build(BuildContext context) {
     void _showSnackBar() {
       const snackBar = SnackBar(
@@ -46,7 +45,6 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     return BlocListener<LoginBloc, LoginState>(
-
       listener: (context, state) {
         if (state is LoginFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -214,13 +212,7 @@ class _LoginFormState extends State<LoginForm> {
 
                               usercontroller.setCurrentUser(user);
 
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const BottomNavigation(),
-                                ),
-                              );
+                              Get.to(const BottomNavigation());
                             } else {
                               _showSnackBar();
                             }
