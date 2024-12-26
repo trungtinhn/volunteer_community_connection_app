@@ -97,14 +97,15 @@ class _SignUpFormState extends State<SignUpForm> {
       print('Full name: ${fullNameController.text}');
       if (await _validate()) {
         User user = User(
-          userId: 0,
-          name: fullNameController.text,
-          email: emailController.text,
-          phoneNumber: phoneNumberController.text,
-          dayOfBirth: dayOfBirth,
-          role: 'user',
-          avatarUrl: '',
-        );
+            userId: 0,
+            name: fullNameController.text,
+            email: emailController.text,
+            phoneNumber: phoneNumberController.text,
+            dayOfBirth: dayOfBirth,
+            role: 'user',
+            avatarUrl: '',
+            countDonate: 0,
+            countPosts: 0);
         var result =
             await _authcontroller.register(user, passwordController.text);
         if (result) {
