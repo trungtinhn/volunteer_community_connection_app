@@ -59,6 +59,33 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> changeAvatar(
+      String endpoint, File? image) async {
+    final url = Uri.parse('$API_URL$endpoint');
+
+    var request = http.MultipartRequest('PUT', url);
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'avatar',
+        image.path,
+      ));
+    }
+
+    try {
+      final response = await request.send();
+      final responseData = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(responseData.body);
+      } else {
+        throw Exception(
+            'Failed POST request: ${response.statusCode}, ${responseData.body}');
+      }
+    } catch (e) {
+      throw Exception('POST error: $e');
+    }
+  }
+
   // Hàm GET
   Future<Map<String, dynamic>> get(String endpoint) async {
     final url = Uri.parse('$API_URL$endpoint');

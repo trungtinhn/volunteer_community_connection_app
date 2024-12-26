@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/repositories/auth_repository.dart';
 
 class Authcontroller extends GetxController {
@@ -25,5 +26,15 @@ class Authcontroller extends GetxController {
     }
 
     return false;
+  }
+
+  Future<bool> register(User user, String password) async {
+    try {
+      final bool result = await _authRepository.register(user, password);
+
+      return result;
+    } catch (e) {
+      return false;
+    }
   }
 }

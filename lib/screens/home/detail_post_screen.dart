@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/comment_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/models/comment.dart';
 
 import '../../models/post.dart';
@@ -20,9 +21,11 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
   bool isExpanded = false;
 
   final CommentController _commentController = Get.put(CommentController());
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
 
   String? replyTo; // Tên người dùng đang được trả lời
   final TextEditingController commentController = TextEditingController();
+  int? _selectReplyId;
 
   @override
   void initState() {
@@ -76,6 +79,20 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
         await _commentController.getCommentsByPost(widget.post.postId);
   }
 
+  Future<void> _createComment() async {
+    final Map<String, dynamic> commentData = {
+      'content': commentController.text,
+      'postId': widget.post.postId,
+      'userId': _usercontroller.getCurrentUser()!.userId,
+      'createDate': DateTime.now().toIso8601String(),
+      'parentCommentId': _selectReplyId
+    };
+    await _commentController.createComment(commentData);
+    commentController.clear();
+    _selectReplyId = null;
+    _fetchComments();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +116,11 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(widget.post.avatarUrl!),
+                          backgroundImage: widget.post.avatarUrl != null
+                              ? NetworkImage(widget.post.avatarUrl!)
+                              : const AssetImage(
+                                      'assets/images/default_avatar.jpg')
+                                  as ImageProvider<Object>,
                           radius: 25,
                         ),
                         const SizedBox(width: 10),
@@ -114,15 +135,14 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 15,
-                              color: AppColors.blue,
+                            Icon(
+                              Icons.arrow_right,
+                              color: AppColors.buleJeans,
                             ),
-                            Text('Hỗ trợ bão cho đồng bào',
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: kLableSize15Bluew600),
+                            Text(
+                              '${widget.post.communityName}',
+                              style: kLableSize15Bluew600,
+                            )
                           ],
                         ),
                       ],
@@ -177,7 +197,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
 
                   widget.post.imageUrl != null
                       ? Center(
-                          child: Image.network(postData['imageUrl'],
+                          child: Image.network(widget.post.imageUrl!,
                               fit: BoxFit.cover))
                       : const SizedBox.shrink(),
                   // Like, Comment, Share
@@ -257,7 +277,10 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(comment.avatarUrl!),
+                backgroundImage: comment.avatarUrl != null
+                    ? NetworkImage(comment.avatarUrl!)
+                    : const AssetImage('assets/images/default_avatar.jpg')
+                        as ImageProvider<Object>,
                 radius: 20,
               ),
               const SizedBox(width: 10),
@@ -293,11 +316,21 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                 comment.parentCommentId == null
                     ? GestureDetector(
                         onTap: () {
-                          // Xử lý sự kiện nhấn nút "Phản hồi"
+                          setState(() {
+                            if (_selectReplyId == comment.commentId) {
+                              _selectReplyId = null;
+                            } else {
+                              _selectReplyId = comment.commentId;
+                            }
+                          });
+
                           debugPrint(
                               "Phản hồi bình luận của ${comment.userName}");
                         },
-                        child: Text("Phản hồi", style: kLableSize13Grey),
+                        child: Text("Phản hồi",
+                            style: _selectReplyId == comment.commentId
+                                ? kLableSize13Blue
+                                : kLableSize13Grey),
                       )
                     : const SizedBox.shrink(),
               ],
@@ -349,17 +382,30 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
             ),
           Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/image_sample.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+              _usercontroller.getCurrentUser()!.avatarUrl == null
+                  ? Container(
+                      width: 50,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/default_avatar.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: NetworkImage(
+                              _usercontroller.getCurrentUser()!.avatarUrl!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
               const SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
@@ -387,6 +433,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
               IconButton(
                 icon: const Icon(Icons.send, color: Colors.blue),
                 onPressed: () {
+                  _createComment();
                   debugPrint(
                       'Đã gửi bình luận: ${commentController.text} - Trả lời: $replyTo');
                   setState(() {

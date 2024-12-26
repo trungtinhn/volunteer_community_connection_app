@@ -6,9 +6,17 @@ import 'package:volunteer_community_connection_app/models/post.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
+  final bool showCommunity;
   final VoidCallback onTap;
+  final VoidCallback onTapLike;
 
-  const PostCard({super.key, required this.post, required this.onTap});
+  const PostCard({
+    super.key,
+    required this.post,
+    required this.onTap,
+    required this.showCommunity,
+    required this.onTapLike,
+  });
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -34,23 +42,34 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  widget.post.avatarUrl != null
-                      ? Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(widget.post.avatarUrl!),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle),
-                        )
-                      : const SizedBox.shrink(),
+                  CircleAvatar(
+                    backgroundImage: widget.post.avatarUrl != null
+                        ? NetworkImage(widget.post.avatarUrl!)
+                        : const AssetImage('assets/images/default_avatar.jpg')
+                            as ImageProvider<Object>,
+                    radius: 25,
+                  ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.post.userName, style: kLableSize15Black),
+                      Row(
+                        children: [
+                          Text(widget.post.userName, style: kLableSize15Black),
+                          widget.showCommunity
+                              ? Icon(
+                                  Icons.arrow_right,
+                                  color: AppColors.buleJeans,
+                                )
+                              : const Text(''),
+                          widget.showCommunity
+                              ? Text(
+                                  '${widget.post.communityName}',
+                                  style: kLableSize15Bluew600,
+                                )
+                              : const Text('')
+                        ],
+                      ),
                       Text(widget.post.timeAgo!, style: kLableSize13Grey),
                     ],
                   ),
@@ -102,22 +121,32 @@ class _PostCardState extends State<PostCard> {
               ),
             const SizedBox(height: 10),
             widget.post.imageUrl != null
-                ? Image.asset(widget.post.imageUrl!, fit: BoxFit.cover)
+                ? Container(
+                    height: 200,
+                    width: double.infinity,
+                    child:
+                        Image.network(widget.post.imageUrl!, fit: BoxFit.cover),
+                  )
                 : const SizedBox.shrink(),
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/svgs/heart.svg'),
-                      const SizedBox(width: 5),
-                      Text(
-                        widget.post.likeCount.toString(),
-                        style: kLableSize13Black,
-                      ),
-                    ],
+                  InkWell(
+                    onTap: widget.onTapLike,
+                    child: Row(
+                      children: [
+                        widget.post.isLiked
+                            ? SvgPicture.asset('assets/svgs/heart_fill.svg')
+                            : SvgPicture.asset('assets/svgs/heart.svg'),
+                        const SizedBox(width: 5),
+                        Text(
+                          widget.post.likeCount.toString(),
+                          style: kLableSize13Black,
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [

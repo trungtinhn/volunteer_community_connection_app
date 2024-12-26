@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/rank_card.dart';
 import 'package:volunteer_community_connection_app/components/top_three_rank.dart';
+import 'package:volunteer_community_connection_app/controllers/donation_controller.dart';
+import 'package:volunteer_community_connection_app/models/community.dart';
 
 class DonorTab extends StatefulWidget {
-  const DonorTab({super.key});
+  final Community community;
+  const DonorTab({super.key, required this.community});
 
   @override
   State<DonorTab> createState() => DonorTabState();
 }
 
 class DonorTabState extends State<DonorTab> {
+  final DonationController _donationController = Get.put(DonationController());
+
   final List<Map<String, dynamic>> leaderboardData = [
     {
       'rank': 1,
@@ -72,31 +78,51 @@ class DonorTabState extends State<DonorTab> {
       'amount': '65.000đ',
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    loadContributors();
+  }
+
+  Future<void> loadContributors() async {
+    _donationController.loadedDonations.value =
+        await _donationController.getContributors(widget.community.communityId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 16),
-        Top3Component(top3: leaderboardData.sublist(0, 3)),
-        const SizedBox(height: 16),
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            itemCount: leaderboardData.length - 3, // Bỏ qua Top 3
-            itemBuilder: (context, index) {
-              final data = leaderboardData[index + 3]; // Lấy dữ liệu từ hạng 4
-              return RankCard(
-                rank: data['rank'],
-                avatar: data['avatar'],
-                name: data['name'],
-                amount: data['amount'],
-                isEven: (index + 3) % 2 == 0, // Xen kẽ màu dựa trên vị trí thực
-              );
-            },
-          ),
+        Obx(
+          () => Top3Component(top3: _donationController.loadedDonations.value),
         ),
+        const SizedBox(height: 16),
+        if (_donationController.loadedDonations.length > 3)
+          Obx(
+            () => Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: _donationController.loadedDonations.length -
+                    3, // Bỏ qua Top 3
+                itemBuilder: (context, index) {
+                  final data = _donationController
+                      .loadedDonations[index + 3]; // Lấy dữ liệu từ hạng 4
+                  return RankCard(
+                    rank: index + 3,
+                    avatar: data.avatarUrl,
+                    name: data.userName,
+                    amount: data.amount,
+                    isEven:
+                        (index + 3) % 2 == 0, // Xen kẽ màu dựa trên vị trí thực
+                  );
+                },
+              ),
+            ),
+          )
       ],
     );
   }

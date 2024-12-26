@@ -25,4 +25,8 @@ class CommentController extends GetxController {
   Future<void> setEmptyComment() async {
     loadedComment.value = [];
   }
+
+  Future<void> createComment(Map<String, dynamic> comment) async {
+    await _commentRepository.createComment(comment);
+  }
 }

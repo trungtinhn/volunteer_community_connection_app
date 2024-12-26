@@ -10,9 +10,12 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/helpers/util.dart';
+import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/donate/donation_screen.dart';
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
+
+import '../../models/community.dart';
 
 class DetailsDonationScreen extends StatefulWidget {
   final int communityId;
@@ -31,9 +34,29 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
   bool isExpanded = false;
   int _selectedTabIndex = 0;
 
-  final PostController _postController = Get.put(PostController());
   final CommunityController _communityController =
       Get.put(CommunityController());
+  int communityId = 1;
+
+  Community community = Community(
+      communityId: 1,
+      communityName: 'Community 1',
+      description: 'Description 1',
+      imageUrl: 'assets/images/covid_relief.jpg',
+      isPublished: true,
+      targetAmount: 20000,
+      currentAmount: 10000,
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+      type: 'Quyên góp đồ vật',
+      createDate: DateTime.now(),
+      adminId: 1,
+      donationCount: 5,
+      longtitude: 0.0,
+      latitude: 0.0);
+
+  final PostController _postController = Get.put(PostController());
+  final Usercontroller _usercontroller = Get.put(Usercontroller());
 
   @override
   void initState() {
@@ -64,7 +87,8 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   Future<void> loadPosts() async {
     _postController.loadedPosts.value =
-        await _postController.getPostsByCommunity(widget.communityId);
+        await _postController.getPostsByCommunity(
+            communityId, _usercontroller.getCurrentUser()!.userId);
   }
 
   Color _getStatusBackgroundColor(String status) {
@@ -305,8 +329,21 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 25,
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        PostTab(
+                          community: community,
+                        ),
+                        DonorTab(
+                          community: community,
+                        ),
+                      ],
                     ),
                   ],
                 ),
