@@ -49,13 +49,6 @@ class _InputTextFieldState extends State<InputText> {
             height: 8,
           ),
           TextFormField(
-              obscureText:
-                  widget.obscureText != null && widget.obscureText == true
-                      ? true
-                      : false,
-              readOnly: widget.readOnly != null && widget.readOnly == true
-                  ? true
-                  : false,
               initialValue: widget.name,
               validator: (value) =>
                   (value?.isEmpty ?? true) ? 'Title is required' : null,

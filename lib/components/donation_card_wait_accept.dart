@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:volunteer_community_connection_app/components/button_blue.dart';
+import 'package:volunteer_community_connection_app/components/button_green.dart';
+import 'package:volunteer_community_connection_app/components/button_red.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 
-class DonationCard extends StatelessWidget {
+class DonationCardWaitAccept extends StatelessWidget {
   final String status;
   final String title;
   final String type;
@@ -15,11 +16,13 @@ class DonationCard extends StatelessWidget {
   final int donationCount;
   final double currentAmount;
   final double goalAmount;
-  final VoidCallback onDonate;
+  final VoidCallback onAccept;
+  final VoidCallback onDeny;
   final VoidCallback onDetails;
   final String imageUrl;
+  final String role;
 
-  const DonationCard({
+  const DonationCardWaitAccept({
     super.key,
     required this.status,
     required this.title,
@@ -31,16 +34,18 @@ class DonationCard extends StatelessWidget {
     required this.donationCount,
     required this.currentAmount,
     required this.goalAmount,
-    required this.onDonate,
+    required this.onAccept,
+    required this.onDeny,
     required this.onDetails,
     required this.imageUrl,
+    required this.role,
   });
 
   Color _getStatusBackgroundColor(String status) {
     switch (status) {
       case 'Sắp diễn ra':
         return Colors.yellow[100]!;
-      case 'Đang diễn ra':
+      case 'Đã duyệt':
         return Colors.green[100]!;
       default:
         return Colors.pink[100]!;
@@ -161,13 +166,21 @@ class DonationCard extends StatelessWidget {
                                 style: kLableSize15Black),
                           ],
                         ),
-                        const SizedBox(height: 16),
                       ],
                     ),
-
-                  if ({'Đang diễn ra'}.contains(status) &&
-                      type == 'Quyên góp tiền')
-                    ButtonBlue(des: 'Quyên góp ngay', onPress: onDonate),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      if (role == 'admin')
+                        ButtonGreen(
+                          des: 'Duyệt dự án',
+                          onPress: onAccept,
+                        ),
+                      if ({'Đang chờ duyệt'}.contains(status))
+                        ButtonRed(des: 'Từ chối dự án', onPress: onDeny),
+                    ],
+                  )
                 ],
               ),
             ),

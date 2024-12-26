@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/donation_card.dart';
 import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
+import 'package:volunteer_community_connection_app/helpers/util.dart';
 import 'package:volunteer_community_connection_app/screens/donate/details_donation_screen.dart';
 
 class GoingOnTab extends StatefulWidget {
@@ -48,16 +49,21 @@ class GoingOnTabState extends State<GoingOnTab> {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: DonationCard(
-              status: 'Đang diễn ra',
+              status: data.checkStatus(),
               title: data.communityName,
               type: data.type,
+              description: data.description,
+              startDate: formatDate(data.startDate),
+              endDate: formatDate(data.endDate),
               progress: progress,
               donationCount: data.donationCount,
               currentAmount: data.currentAmount,
               goalAmount: data.targetAmount ?? 0,
               imageUrl: data.imageUrl,
               onDetails: () {
-                Get.to(() => const DetailsDonationScreen());
+                Get.to(() => DetailsDonationScreen(
+                      communityId: data.communityId,
+                    ));
               },
               onDonate: () {},
             ),
