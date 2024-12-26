@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   // ignore: constant_identifier_names
   static const String API_URL =
-      'https://1e80-2405-4802-31-5060-697d-d3ba-2126-e634.ngrok-free.app';
+      'https://11d3-2405-4802-31-5060-697d-d3ba-2126-e634.ngrok-free.app';
 
   // Hàm POST
   Future<Map<String, dynamic>> post(

@@ -15,4 +15,8 @@ class DonationController extends GetxController {
   Future<List<Donation>> getContributors(int communityId) async {
     return await _donationRepository.getContributors(communityId);
   }
+
+  Future<bool> addDonation(Map<String, String> donation) async {
+    return await _donationRepository.addDonation(donation);
+  }
 }
