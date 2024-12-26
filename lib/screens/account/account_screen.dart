@@ -164,14 +164,14 @@ class _AccountScreenState extends State<AccountScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // const Text(
-              //   'Sống một đời an nhiên và hạnh phúc',
-              //   style: TextStyle(
-              //     fontSize: 14,
-              //     color: Colors.grey,
-              //   ),
-              //   textAlign: TextAlign.center,
-              // ),
+              Text(
+                _selectedUser!.email,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
 
               // Hàng thống kê

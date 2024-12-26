@@ -7,7 +7,6 @@ class ApiService {
 
   static const String API_URL = 'https://1db0-14-169-85-51.ngrok-free.app';
 
-
   // Hàm POST
   Future<Map<String, dynamic>> post(
       String endpoint, Map<String, dynamic>? data) async {
