@@ -11,6 +11,8 @@ import 'package:volunteer_community_connection_app/models/community.dart';
 import 'package:volunteer_community_connection_app/screens/home/create_post_screen.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
+import '../screens/account/account_screen.dart';
+
 class PostTab extends StatefulWidget {
   final Community community;
   const PostTab({super.key, required this.community});
@@ -49,11 +51,13 @@ class PostTabState extends State<PostTab> {
   final Usercontroller _usercontroller = Get.put(Usercontroller());
 
   Future<void> likePost(int postId) async {
-    await _likeController.likePost(
+    var result = await _likeController.likePost(
         _usercontroller.getCurrentUser()!.userId, postId);
-    var post = await _postController.getPost(
-        postId, _usercontroller.getCurrentUser()!.userId);
-    await _postController.updateLoadedPosts(post);
+    if (result) {
+      var post = await _postController.getPost(
+          postId, _usercontroller.getCurrentUser()!.userId);
+      await _postController.updateLoadedPosts(post);
+    }
   }
 
   @override
@@ -67,16 +71,13 @@ class PostTabState extends State<PostTab> {
           const SizedBox(height: 10),
           Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/image_sample.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              CircleAvatar(
+                backgroundImage: _usercontroller.getCurrentUser()!.avatarUrl !=
+                        null
+                    ? NetworkImage(_usercontroller.getCurrentUser()!.avatarUrl!)
+                    : const AssetImage('assets/images/default_avatar.jpg')
+                        as ImageProvider<Object>,
+                radius: 25,
               ),
               const SizedBox(width: 10),
               GestureDetector(
@@ -113,6 +114,11 @@ class PostTabState extends State<PostTab> {
               itemBuilder: (context, index) {
                 var post = _postController.loadedPosts[index];
                 return PostCard(
+                  onTapViewAccount: () async {
+                    var user = await _usercontroller.getUser(post.userId);
+
+                    Get.to(() => AccountScreen(user: user!));
+                  },
                   onTapLike: () {
                     likePost(post.postId);
                   },

@@ -9,6 +9,7 @@ class PostCard extends StatefulWidget {
   final bool showCommunity;
   final VoidCallback onTap;
   final VoidCallback onTapLike;
+  final VoidCallback onTapViewAccount;
 
   const PostCard({
     super.key,
@@ -16,6 +17,7 @@ class PostCard extends StatefulWidget {
     required this.onTap,
     required this.showCommunity,
     required this.onTapLike,
+    required this.onTapViewAccount,
   });
 
   @override
@@ -42,12 +44,15 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: widget.post.avatarUrl != null
-                        ? NetworkImage(widget.post.avatarUrl!)
-                        : const AssetImage('assets/images/default_avatar.jpg')
-                            as ImageProvider<Object>,
-                    radius: 25,
+                  InkWell(
+                    onTap: widget.onTapViewAccount,
+                    child: CircleAvatar(
+                      backgroundImage: widget.post.avatarUrl != null
+                          ? NetworkImage(widget.post.avatarUrl!)
+                          : const AssetImage('assets/images/default_avatar.jpg')
+                              as ImageProvider<Object>,
+                      radius: 25,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Column(
@@ -55,9 +60,12 @@ class _PostCardState extends State<PostCard> {
                     children: [
                       Row(
                         children: [
-                          Text(widget.post.userName, style: kLableSize15Black),
+                          InkWell(
+                              onTap: widget.onTapViewAccount,
+                              child: Text(widget.post.userName,
+                                  style: kLableSize15Black)),
                           widget.showCommunity
-                              ? Icon(
+                              ? const Icon(
                                   Icons.arrow_right,
                                   color: AppColors.buleJeans,
                                 )
@@ -133,35 +141,53 @@ class _PostCardState extends State<PostCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  InkWell(
-                    onTap: widget.onTapLike,
-                    child: Row(
-                      children: [
-                        widget.post.isLiked
-                            ? SvgPicture.asset('assets/svgs/heart_fill.svg')
-                            : SvgPicture.asset('assets/svgs/heart.svg'),
-                        const SizedBox(width: 5),
-                        Text(
-                          widget.post.likeCount.toString(),
-                          style: kLableSize13Black,
+                  Expanded(
+                    child: InkWell(
+                      onTap: widget.onTapLike,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            widget.post.isLiked
+                                ? SvgPicture.asset('assets/svgs/heart_fill.svg')
+                                : SvgPicture.asset('assets/svgs/heart.svg'),
+                            const SizedBox(width: 5),
+                            Text(
+                              widget.post.likeCount.toString(),
+                              style: kLableSize13Black,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/svgs/comment.svg'),
-                      const SizedBox(width: 5),
-                      Text(widget.post.commentCount.toString(),
-                          style: kLableSize13Black),
-                    ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset('assets/svgs/comment.svg'),
+                          const SizedBox(width: 5),
+                          Text(widget.post.commentCount.toString(),
+                              style: kLableSize13Black),
+                        ],
+                      ),
+                    ),
                   ),
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/svgs/send.svg'),
-                      const SizedBox(width: 5),
-                      Text('1', style: kLableSize13Black),
-                    ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset('assets/svgs/send.svg'),
+                          const SizedBox(width: 5),
+                          Text('1', style: kLableSize13Black),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

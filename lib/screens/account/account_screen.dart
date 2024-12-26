@@ -9,10 +9,14 @@ import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/controllers/like_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
+import '../../models/post.dart';
+
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  final User user;
+  const AccountScreen({super.key, required this.user});
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -46,12 +50,16 @@ class _AccountScreenState extends State<AccountScreen> {
     },
   ];
 
-  Future<void> _fetchMyPosts() async {
-    _postController.myPosts.clear();
-    _postController.myPosts.value = await _postController.getPostsByUser(
-      _usercontroller.getCurrentUser()!.userId,
+  User? _selectedUser;
+  List<Post> _listPosts = [];
+
+  Future<void> _fetchPosts() async {
+    _listPosts.clear();
+    _listPosts = await _postController.getPostsByUser(
+      _selectedUser!.userId,
       _usercontroller.getCurrentUser()!.userId,
     );
+    setState(() {});
   }
 
   Future<void> likePost(int postId) async {
@@ -83,9 +91,17 @@ class _AccountScreenState extends State<AccountScreen> {
     await _pickImage(ImageSource.gallery);
     if (_selectedImage != null) {
       var user = await _usercontroller.changeAvatar(
-          _usercontroller.getCurrentUser()!.userId, _selectedImage!);
+          _selectedUser!.userId, _selectedImage!);
       if (user != null) {
-        _usercontroller.setCurrentUser(user);
+        _selectedUser = user;
+
+        setState(() {
+          _selectedImage = null;
+        });
+
+        if (_usercontroller.getCurrentUser()!.userId == _selectedUser!.userId) {
+          _usercontroller.setCurrentUser(user);
+        }
       }
     }
   }
@@ -94,7 +110,8 @@ class _AccountScreenState extends State<AccountScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fetchMyPosts();
+    _selectedUser = widget.user;
+    _fetchPosts();
   }
 
   @override
@@ -108,19 +125,14 @@ class _AccountScreenState extends State<AccountScreen> {
               // Ảnh đại diện
               Stack(
                 children: [
-                  Obx(
-                    () => CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _usercontroller
-                                  .getCurrentUser()!
-                                  .avatarUrl !=
-                              null
-                          ? NetworkImage(
-                              _usercontroller.getCurrentUser()!.avatarUrl!,
-                            )
-                          : const AssetImage('assets/images/default_avatar.jpg')
-                              as ImageProvider,
-                    ),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: _selectedUser!.avatarUrl != null
+                        ? NetworkImage(
+                            _selectedUser!.avatarUrl!,
+                          )
+                        : const AssetImage('assets/images/default_avatar.jpg')
+                            as ImageProvider,
                   ),
                   Positioned(
                     bottom: 0,
@@ -145,65 +157,69 @@ class _AccountScreenState extends State<AccountScreen> {
               const SizedBox(height: 10),
 
               // Tên và mô tả
-              const Text(
-                'Bruno Pham',
-                style: TextStyle(
+              Text(
+                _selectedUser!.name,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Text(
-                'Sống một đời an nhiên và hạnh phúc',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              // const Text(
+              //   'Sống một đời an nhiên và hạnh phúc',
+              //   style: TextStyle(
+              //     fontSize: 14,
+              //     color: Colors.grey,
+              //   ),
+              //   textAlign: TextAlign.center,
+              // ),
               const SizedBox(height: 20),
 
               // Hàng thống kê
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatistic('140', 'Bài đăng'),
-                  _buildStatistic('14.5K', 'Bạn bè'),
-                  _buildStatistic('250K', 'Số lần quyên góp'),
+                  _buildStatistic(
+                      _selectedUser!.countPosts.toString(), 'Bài đăng'),
+                  _buildStatistic(_selectedUser!.countDonate.toString(),
+                      'Số lần quyên góp'),
                 ],
               ),
               const SizedBox(height: 20),
 
               // Nút hành động
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildActionButton(Icons.person_add, AppColors.darkBlue),
-                  const SizedBox(width: 20),
-                  _buildActionButton(Icons.email, Colors.blue),
-                ],
-              ),
-              Obx(
-                () => ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _postController.myPosts.length,
-                  itemBuilder: (context, index) {
-                    var post = _postController.myPosts[index];
-                    return PostCard(
-                      onTapLike: () {
-                        likePost(post.postId);
-                      },
-                      post: post,
-                      showCommunity: true,
-                      onTap: () {
-                        Get.to(() => DetailPostScreen(
-                              post: post,
-                            ));
-                      },
-                    );
-                  },
+              if (_usercontroller.getCurrentUser()!.userId !=
+                  _selectedUser!.userId)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildActionButton(Icons.email, Colors.blue),
+                  ],
                 ),
-              )
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _listPosts.length,
+                itemBuilder: (context, index) {
+                  var post = _listPosts[index];
+                  return PostCard(
+                    onTapViewAccount: () async {
+                      var user = await _usercontroller.getUser(post.userId);
+
+                      Get.to(() => AccountScreen(user: user!));
+                    },
+                    onTapLike: () {
+                      likePost(post.postId);
+                    },
+                    post: post,
+                    showCommunity: true,
+                    onTap: () {
+                      Get.to(() => DetailPostScreen(
+                            post: post,
+                          ));
+                    },
+                  );
+                },
+              ),
             ],
           ),
         ),

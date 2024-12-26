@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // ignore: constant_identifier_names
+
   static const String API_URL = 'https://1db0-14-169-85-51.ngrok-free.app';
 
   // Hàm POST
@@ -27,6 +28,26 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('POST error: $e');
+    }
+  }
+
+  Future<bool> postBool(String endpoint, Map<String, dynamic>? data) async {
+    final url = Uri.parse('$API_URL$endpoint');
+    try {
+      final response = data != null
+          ? await http.post(
+              url,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(data),
+            )
+          : await http.post(url);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 

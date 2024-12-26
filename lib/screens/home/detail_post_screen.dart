@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/comment_controller.dart';
+import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/models/comment.dart';
 
+import '../../controllers/like_controller.dart';
 import '../../models/post.dart';
 
 class DetailPostScreen extends StatefulWidget {
@@ -22,57 +24,21 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
 
   final CommentController _commentController = Get.put(CommentController());
   final Usercontroller _usercontroller = Get.put(Usercontroller());
+  final PostController _postController = Get.put(PostController());
+  final LikeController _likeController = Get.put(LikeController());
 
   String? replyTo; // Tên người dùng đang được trả lời
   final TextEditingController commentController = TextEditingController();
   int? _selectReplyId;
 
+  Post? _selectedPost;
+
   @override
   void initState() {
     super.initState();
     _fetchComments();
+    _selectedPost = widget.post;
   }
-
-  final Map<String, dynamic> postData = {
-    "username": "Nguyễn Văn A",
-    "timeAgo": "2 giờ trước",
-    "description":
-        "Hôm nay là một ngày ý nghĩa khi chúng tôi cùng nhau thực hiện dự án thiện nguyện. Cùng chung tay để mang lại những giá trị tích cực nhé!",
-    "imageUrl": "https://i.pravatar.cc/300",
-    "likes": 120,
-    "comments": 15,
-    "shares": 5,
-  };
-
-  final List<Map<String, dynamic>> commentsData = [
-    {
-      "username": "Người dùng 1",
-      "avatarUrl": "https://i.pravatar.cc/150?img=1",
-      "comment": "Bài viết rất hay và ý nghĩa!",
-      "timeAgo": "2 giờ trước",
-      "children": [
-        {
-          "username": "Người dùng 2",
-          "avatarUrl": "https://i.pravatar.cc/150?img=2",
-          "comment": "Đồng ý, rất ý nghĩa!",
-          "timeAgo": "1 giờ trước",
-        },
-        {
-          "username": "Người dùng 3",
-          "avatarUrl": "https://i.pravatar.cc/150?img=3",
-          "comment": "Mọi người cùng chung tay nhé!",
-          "timeAgo": "30 phút trước",
-        },
-      ]
-    },
-    {
-      "username": "Người dùng 4",
-      "avatarUrl": "https://i.pravatar.cc/150?img=4",
-      "comment": "Mình đã chia sẻ bài viết này!",
-      "timeAgo": "1 ngày trước",
-      "children": [],
-    },
-  ];
 
   Future<void> _fetchComments() async {
     _commentController.loadedComment.value =
@@ -91,6 +57,27 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
     commentController.clear();
     _selectReplyId = null;
     _fetchComments();
+
+    _selectedPost = await _postController.getPost(
+        _selectedPost!.postId, _usercontroller.getCurrentUser()!.userId);
+
+    setState(() {});
+
+    await _postController.updateLoadedPosts(_selectedPost!);
+  }
+
+  Future<void> likePost(int postId) async {
+    print(1);
+    var result = await _likeController.likePost(
+        _usercontroller.getCurrentUser()!.userId, postId);
+    if (result) {
+      var post = await _postController.getPost(
+          postId, _usercontroller.getCurrentUser()!.userId);
+      await _postController.updateLoadedPosts(post);
+
+      _selectedPost = post;
+      setState(() {});
+    }
   }
 
   @override
@@ -116,7 +103,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundImage: widget.post.avatarUrl != null
+                          backgroundImage: _selectedPost!.avatarUrl != null
                               ? NetworkImage(widget.post.avatarUrl!)
                               : const AssetImage(
                                       'assets/images/default_avatar.jpg')
@@ -127,20 +114,21 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(widget.post.userName,
+                            Text(_selectedPost!.userName,
                                 style: kLableSize15Black),
-                            Text(widget.post.timeAgo!, style: kLableSize13Grey),
+                            Text(_selectedPost!.timeAgo!,
+                                style: kLableSize13Grey),
                           ],
                         ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.arrow_right,
                               color: AppColors.buleJeans,
                             ),
                             Text(
-                              '${widget.post.communityName}',
+                              _selectedPost!.communityName,
                               style: kLableSize15Bluew600,
                             )
                           ],
@@ -151,7 +139,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      widget.post.content,
+                      _selectedPost!.content,
                       maxLines: isExpanded ? null : 2,
                       overflow: isExpanded
                           ? TextOverflow.visible
@@ -195,9 +183,9 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                   const SizedBox(height: 10),
                   // Ảnh bài viết
 
-                  widget.post.imageUrl != null
+                  _selectedPost!.imageUrl != null
                       ? Center(
-                          child: Image.network(widget.post.imageUrl!,
+                          child: Image.network(_selectedPost!.imageUrl!,
                               fit: BoxFit.cover))
                       : const SizedBox.shrink(),
                   // Like, Comment, Share
@@ -206,34 +194,56 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                                onTap: () {},
-                                child:
-                                    SvgPicture.asset('assets/svgs/heart.svg')),
-                            const SizedBox(width: 5),
-                            Text(widget.post.likeCount.toString(),
-                                style: kLableSize13Black),
-                          ],
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              likePost(_selectedPost!.postId);
+                              print(222);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _selectedPost!.isLiked
+                                      ? SvgPicture.asset(
+                                          'assets/svgs/heart_fill.svg')
+                                      : SvgPicture.asset(
+                                          'assets/svgs/heart.svg'),
+                                  const SizedBox(width: 5),
+                                  Text(_selectedPost!.likeCount.toString(),
+                                      style: kLableSize13Black),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            SvgPicture.asset('assets/svgs/comment.svg'),
-                            const SizedBox(width: 5),
-                            Text(widget.post.commentCount.toString(),
-                                style: kLableSize13Black),
-                          ],
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset('assets/svgs/comment.svg'),
+                                const SizedBox(width: 5),
+                                Text(_selectedPost!.commentCount.toString(),
+                                    style: kLableSize13Black),
+                              ],
+                            ),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                                onTap: () {},
-                                child:
-                                    SvgPicture.asset('assets/svgs/send.svg')),
-                            const SizedBox(width: 5),
-                            Text('1', style: kLableSize13Black),
-                          ],
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset('assets/svgs/send.svg'),
+                                const SizedBox(width: 5),
+                                Text('1', style: kLableSize13Black),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),

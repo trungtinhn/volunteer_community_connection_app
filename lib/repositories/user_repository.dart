@@ -12,6 +12,12 @@ class UserRepository {
     return User.fromJson(data);
   }
 
+  Future<User?> getUser(int userId) async {
+    final data = await _apiService.get('/api/User/$userId');
+
+    return User.fromJson(data);
+  }
+
   Future<User?> changeAvatar(int userId, File avatar) async {
     final data = await _apiService.changeAvatar(
         '/api/User/change-avatar/$userId', avatar);

@@ -8,7 +8,7 @@ class LikeController extends GetxController {
 
   final LikeRepository likeRepository = LikeRepository();
 
-  Future<void> likePost(userId, postId) async {
-    await likeRepository.likePost(userId, postId);
+  Future<bool> likePost(userId, postId) async {
+    return await likeRepository.likePost(userId, postId);
   }
 }
