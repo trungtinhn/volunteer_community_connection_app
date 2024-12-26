@@ -75,23 +75,44 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           actions: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF1F8),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF1F8),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: IconButton(
-                  icon: SvgPicture.asset('assets/svgs/send.svg'),
-                  onPressed: () {
-                    Get.to(() => const ChatScreen());
-                  }),
+                  child: IconButton(
+                      icon: SvgPicture.asset('assets/svgs/send.svg'),
+                      onPressed: () {
+                        Get.to(() => const ChatScreen());
+                      }),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF1F8),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                      icon: SvgPicture.asset('assets/svgs/send.svg'),
+                      onPressed: () {}),
+                ),
+              ],
             ),
             const SizedBox(width: 16),
           ],

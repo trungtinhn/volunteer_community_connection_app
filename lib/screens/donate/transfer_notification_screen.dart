@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/screens/bottom_nav/bottom_nav.dart';
 
 class TransferNotificationScreen extends StatelessWidget {
   final bool isSuccess;
@@ -48,7 +51,7 @@ class TransferNotificationScreen extends StatelessWidget {
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Quay lại màn hình trước
+                  Get.to(() => const BottomNavigation());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isSuccess ? Colors.green : Colors.red,
@@ -60,9 +63,9 @@ class TransferNotificationScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  "Quay lại",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                child: Text(
+                  "Quay lại trang chủ",
+                  style: kLableSize15White,
                 ),
               ),
             ],
