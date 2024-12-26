@@ -15,8 +15,6 @@ import 'package:volunteer_community_connection_app/screens/donate/donation_scree
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
 
-import '../../models/community.dart';
-
 class DetailsDonationScreen extends StatefulWidget {
   final int communityId;
   const DetailsDonationScreen({super.key, required this.communityId});
@@ -36,24 +34,6 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   final CommunityController _communityController =
       Get.put(CommunityController());
-  int communityId = 1;
-
-  Community community = Community(
-      communityId: 1,
-      communityName: 'Community 1',
-      description: 'Description 1',
-      imageUrl: 'assets/images/covid_relief.jpg',
-      isPublished: true,
-      targetAmount: 20000,
-      currentAmount: 10000,
-      startDate: DateTime.now(),
-      endDate: DateTime.now(),
-      type: 'Quyên góp đồ vật',
-      createDate: DateTime.now(),
-      adminId: 1,
-      donationCount: 5,
-      longtitude: 0.0,
-      latitude: 0.0);
 
   final PostController _postController = Get.put(PostController());
   final Usercontroller _usercontroller = Get.put(Usercontroller());
@@ -88,7 +68,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
   Future<void> loadPosts() async {
     _postController.loadedPosts.value =
         await _postController.getPostsByCommunity(
-            communityId, _usercontroller.getCurrentUser()!.userId);
+            widget.communityId, _usercontroller.getCurrentUser()!.userId);
   }
 
   Color _getStatusBackgroundColor(String status) {
@@ -140,6 +120,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         if (community.targetAmount != null) {
           progress = community.currentAmount / community.targetAmount!;
         }
+        bool isGoing = community.endDate.isAfter(DateTime.now());
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +247,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                         ],
                       ),
                     const SizedBox(height: 8),
-                    if ({'Đang diễn ra'}.contains(status))
+                    if (isGoing && community.type == 'Quyên góp tiền')
                       ButtonBlue(
                           des: 'Quyên góp ngay',
                           onPress: () {
@@ -310,7 +291,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                           labelStyle: kLableSize15Blue,
                           dividerColor: Colors.white,
                           tabs: [
-                            buildTab(0, 'Bài đăng', 1),
+                            buildTab(0, 'Bài đăng', 2),
                             buildTab(1, 'Nhà hảo tâm', 2),
                           ],
                         ),
@@ -324,10 +305,10 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                         controller: _tabController,
                         children: [
                           PostTab(
-                            community: community,
+                            community: _communityController.community.value!,
                           ),
                           DonorTab(
-                            community: community,
+                            community: _communityController.community.value!,
                           ),
                         ],
                       ),
