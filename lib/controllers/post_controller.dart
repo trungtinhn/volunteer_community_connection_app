@@ -55,7 +55,7 @@ class PostController extends GetxController {
     loadedPosts.value = <Post>[];
   }
 
-  Future<bool> createPost(Map<String, String> postData, File? image) {
+  Future<Post> createPost(Map<String, String> postData, File? image) {
     return _postRepository.createPost(postData, image);
   }
 }

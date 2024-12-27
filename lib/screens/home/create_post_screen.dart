@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/input_text.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
+import 'package:volunteer_community_connection_app/controllers/notification_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/models/community.dart';
+import 'package:volunteer_community_connection_app/models/post.dart';
 
 import '../../components/button_blue.dart';
 import '../../components/input_image.dart';
@@ -26,6 +28,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   final Usercontroller _usercontroller = Get.put(Usercontroller());
   final PostController _postController = Get.put(PostController());
+  final NotificationController _notificationController =
+      Get.put(NotificationController());
 
   void _createPost() async {
     if (_validatePost()) {
@@ -43,10 +47,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
     try {
       var result = await _postController.createPost(postData, selectedImage);
-      if (result) {
+      if (result != null) {
         _showMessage('Tạo bài đăng thanh cong', isSuccess: true);
         await _postController.getPostsByCommunity(widget.community.communityId,
             _usercontroller.getCurrentUser()!.userId);
+        await createNotification(result);
         Get.back();
       } else {
         _showMessage('Tạo bài đăng that bai', isSuccess: false);
@@ -54,6 +59,26 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     } catch (e) {
       _showMessage('Tạo bài đăng that bai', isSuccess: false);
     }
+  }
+
+  Future<void> createNotification(Post post) async {
+    if (_usercontroller.getCurrentUser()!.userId == widget.community.adminId) {
+      return;
+    }
+
+    final Map<String, String> notificationData = {
+      'content': 'Đã đăng bài tại',
+      'title': widget.community.communityName,
+      'userId': widget.community.adminId.toString(),
+      'senderId': _usercontroller.getCurrentUser()!.userId.toString(),
+      'createdAt': DateTime.now().toIso8601String(),
+      'isRead': false.toString(),
+      'type': 'POST',
+      'communityId': widget.community.communityId.toString(),
+      'postId': post.postId.toString(),
+    };
+
+    await _notificationController.createNotification(notificationData);
   }
 
   bool _validatePost() {
