@@ -10,6 +10,7 @@ String formatDate(DateTime date) {
 /// Lấy địa chỉ từ tọa độ `LatLng`.
 Future<String> getAddressFromLatLng(LatLng position) async {
   try {
+    print(position);
     // Kiểm tra tọa độ hợp lệ
     if (position.latitude < -90 ||
         position.latitude > 90 ||

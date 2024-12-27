@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:volunteer_community_connection_app/components/button_blue.dart';
 import 'package:volunteer_community_connection_app/components/map_view.dart';
@@ -37,6 +38,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   final PostController _postController = Get.put(PostController());
   final Usercontroller _usercontroller = Get.put(Usercontroller());
+  String _address = 'Đang lấy địa chỉ...';
 
   @override
   void initState() {
@@ -63,6 +65,14 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   Future<void> loadCommunity(int communityId) async {
     await _communityController.getCommunityById(communityId);
+    if (_communityController.community.value!.type == 'Quyên góp đồ vật') {
+      String data = await getAddressFromLatLng(LatLng(
+          _communityController.community.value!.latitude!,
+          _communityController.community.value!.longtitude!));
+      setState(() {
+        _address = data;
+      });
+    }
   }
 
   Future<void> loadPosts() async {
@@ -225,10 +235,10 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                  '${community.currentAmount.toStringAsFixed(0)}đ',
+                                  '${NumberFormat.decimalPattern('vi').format(community.currentAmount)}đ',
                                   style: kLableSize15Blue),
                               Text(
-                                  '/ ${community.targetAmount!.toStringAsFixed(0)}đ',
+                                  '/ ${NumberFormat.decimalPattern('vi').format(community.targetAmount)}đ',
                                   style: kLableSize15Black),
                             ],
                           ),
@@ -239,7 +249,10 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Địa chỉ quyên góp: ', style: kLableSize15Black),
+                          Text('Địa chỉ quyên góp:',
+                              style: kLableSize16ww600Black),
+                          const SizedBox(height: 8),
+                          Text(_address, style: kLableSize15Black),
                           const SizedBox(height: 8),
                           MapView(
                               position: LatLng(

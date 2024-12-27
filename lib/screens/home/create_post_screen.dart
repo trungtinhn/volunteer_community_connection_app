@@ -1,9 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:volunteer_community_connection_app/components/input_number.dart';
 import 'package:volunteer_community_connection_app/components/input_text.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
 import 'package:volunteer_community_connection_app/constants/app_styles.dart';
@@ -48,9 +45,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       var result = await _postController.createPost(postData, selectedImage);
       if (result) {
         _showMessage('Tạo bài đăng thanh cong', isSuccess: true);
-        _postController.getPostsByCommunity(widget.community.communityId,
+        await _postController.getPostsByCommunity(widget.community.communityId,
             _usercontroller.getCurrentUser()!.userId);
-        Navigator.pop(context);
+        Get.back();
       } else {
         _showMessage('Tạo bài đăng that bai', isSuccess: false);
       }

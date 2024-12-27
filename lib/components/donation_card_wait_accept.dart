@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:volunteer_community_connection_app/components/button_green.dart';
 import 'package:volunteer_community_connection_app/components/button_red.dart';
 import 'package:volunteer_community_connection_app/constants/app_colors.dart';
@@ -160,9 +161,11 @@ class DonationCardWaitAccept extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text('${currentAmount.toStringAsFixed(0)}đ',
+                            Text(
+                                '${NumberFormat.decimalPattern('vi').format(currentAmount)}đ',
                                 style: kLableSize15Blue),
-                            Text('/ ${goalAmount.toStringAsFixed(0)}đ',
+                            Text(
+                                '/ ${NumberFormat.decimalPattern('vi').format(goalAmount)}đ',
                                 style: kLableSize15Black),
                           ],
                         ),

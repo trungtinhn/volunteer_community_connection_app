@@ -82,8 +82,8 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
       "EndDate": endDate.toIso8601String(),
       "TargetAmount": targetAmount ?? "",
       "Type": selectedProjectType,
-      "Latitude": latitude?.toString() ?? "",
-      "Longitude": longitude?.toString() ?? "",
+      "Latitude": latitude?.toStringAsFixed(8) ?? "",
+      "Longitude": longitude?.toStringAsFixed(8) ?? "",
     };
 
     try {

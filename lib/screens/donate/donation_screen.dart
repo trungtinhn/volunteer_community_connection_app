@@ -275,6 +275,7 @@ class _DonationScreenState extends State<DonationScreen> {
                                     userId: _userController
                                         .currentUser.value!.userId,
                                     communityId: community.communityId,
+                                    amount: amount,
                                     url: url,
                                   ));
                             }
