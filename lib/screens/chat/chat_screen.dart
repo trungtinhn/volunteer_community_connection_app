@@ -52,51 +52,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _intListMessage();
   }
 
-  final List<Map<String, dynamic>> chatData = [
-    {
-      "name": "Bryan",
-      "message": "What do you think?",
-      "time": "4:30 PM",
-      "unreadCount": 2,
-      "avatarUrl": "https://i.pravatar.cc/150?img=1",
-    },
-    {
-      "name": "Kari",
-      "message": "Looks great!",
-      "time": "4:23 PM",
-      "unreadCount": 1,
-      "avatarUrl": "https://i.pravatar.cc/150?img=2",
-    },
-    {
-      "name": "Diana",
-      "message": "Lunch on Monday?",
-      "time": "4:12 PM",
-      "unreadCount": 0,
-      "avatarUrl": "https://i.pravatar.cc/150?img=3",
-    },
-    {
-      "name": "Ben",
-      "message": "You sent a photo.",
-      "time": "3:58 PM",
-      "unreadCount": 0,
-      "avatarUrl": "https://i.pravatar.cc/150?img=4",
-    },
-    {
-      "name": "Naomi",
-      "message": "Naomi sent a photo.",
-      "time": "3:31 PM",
-      "unreadCount": 0,
-      "avatarUrl": "https://i.pravatar.cc/150?img=5",
-    },
-    {
-      "name": "Alicia",
-      "message": "See you at 8.",
-      "time": "3:30 PM",
-      "unreadCount": 0,
-      "avatarUrl": "https://i.pravatar.cc/150?img=6",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
