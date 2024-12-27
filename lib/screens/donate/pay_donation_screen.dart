@@ -11,11 +11,13 @@ class PayDonation extends StatefulWidget {
   final String url;
   final int userId;
   final int communityId;
+  final int amount;
   const PayDonation(
       {super.key,
       required this.url,
       required this.userId,
-      required this.communityId});
+      required this.communityId,
+      required this.amount});
 
   @override
   State<PayDonation> createState() => _PayDonationState();
@@ -59,7 +61,7 @@ class _PayDonationState extends State<PayDonation> {
                 final Map<String, String> data = {
                   'userId': widget.userId.toString(),
                   'communityId': widget.communityId.toString(),
-                  'amount': uri.queryParameters['vnp_Amount'] ?? '',
+                  'amount': widget.amount.toString(),
                   'donateDate': DateTime.now().toIso8601String(),
                 };
 
