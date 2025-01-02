@@ -42,6 +42,8 @@ class DonationCard extends StatelessWidget {
         return Colors.yellow[100]!;
       case 'Đang diễn ra':
         return Colors.green[100]!;
+      case 'Kết thúc thành công':
+        return Colors.green[300]!;
       default:
         return Colors.pink[100]!;
     }
@@ -52,6 +54,8 @@ class DonationCard extends StatelessWidget {
       case 'Sắp diễn ra':
         return Colors.yellow[800]!;
       case 'Đang diễn ra':
+        return Colors.green[800]!;
+      case 'Kết thúc thành công':
         return Colors.green[800]!;
       default:
         return Colors.pink;
@@ -82,9 +86,11 @@ class DonationCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  Wrap(
+                    spacing: 8, // Khoảng cách giữa các phần tử
+                    runSpacing: 4, // Khoảng cách giữa các dòng
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    verticalDirection: VerticalDirection.up,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -94,6 +100,8 @@ class DonationCard extends StatelessWidget {
                         ),
                         child: Text(
                           status,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: _getStatusTextColor(status),
                             fontSize: 12,
@@ -107,6 +115,7 @@ class DonationCard extends StatelessWidget {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 8),
 
                   // Title

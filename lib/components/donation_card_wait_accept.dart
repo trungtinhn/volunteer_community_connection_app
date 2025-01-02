@@ -175,13 +175,19 @@ class DonationCardWaitAccept extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      if (role == 'admin')
+                      if (role == 'admin' && status == 'Đang chờ duyệt')
                         ButtonGreen(
                           des: 'Duyệt dự án',
                           onPress: onAccept,
                         ),
-                      if ({'Đang chờ duyệt'}.contains(status))
+                      if ({'Đang chờ duyệt'}.contains(status) &&
+                          role == 'admin')
                         ButtonRed(des: 'Từ chối dự án', onPress: onDeny),
+                      if (role == 'user' && status == 'Đang chờ duyệt')
+                        ButtonRed(
+                          des: 'Hủy dự án',
+                          onPress: onDeny,
+                        ),
                     ],
                   )
                 ],

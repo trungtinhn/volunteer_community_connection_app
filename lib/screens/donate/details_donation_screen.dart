@@ -12,6 +12,7 @@ import 'package:volunteer_community_connection_app/controllers/community_control
 import 'package:volunteer_community_connection_app/controllers/post_controller.dart';
 import 'package:volunteer_community_connection_app/helpers/util.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
+import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/screens/donate/donation_screen.dart';
 import 'package:volunteer_community_connection_app/widgets/donor_tab.dart';
 import 'package:volunteer_community_connection_app/widgets/post_tab.dart';
@@ -32,6 +33,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
 
   bool isExpanded = false;
   int _selectedTabIndex = 0;
+  User? adminUser;
 
   final CommunityController _communityController =
       Get.put(CommunityController());
@@ -73,6 +75,12 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         _address = data;
       });
     }
+    var data = await _usercontroller.getUser(
+      _communityController.community.value!.adminId,
+    );
+    setState(() {
+      adminUser = data;
+    });
   }
 
   Future<void> loadPosts() async {
@@ -87,6 +95,8 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         return Colors.yellow[100]!;
       case 'Đang diễn ra':
         return Colors.green[100]!;
+      case 'Kết thúc thành công':
+        return Colors.green[300]!;
       default:
         return Colors.pink[100]!;
     }
@@ -97,6 +107,8 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
       case 'Sắp diễn ra':
         return Colors.yellow[800]!;
       case 'Đang diễn ra':
+        return Colors.green[800]!;
+      case 'Kết thúc thành công':
         return Colors.green[800]!;
       default:
         return Colors.pink;
@@ -121,7 +133,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         ],
       ),
       body: Obx(() {
-        if (_communityController.community.value == null) {
+        if (_communityController.community.value == null || adminUser == null) {
           return const Center(child: CircularProgressIndicator());
         }
         var community = _communityController.community.value!;
@@ -130,7 +142,8 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
         if (community.targetAmount != null) {
           progress = community.currentAmount / community.targetAmount!;
         }
-        bool isGoing = community.endDate.isAfter(DateTime.now());
+        bool isGoing = community.endDate.isAfter(DateTime.now()) &&
+            community.startDate.isBefore(DateTime.now());
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,9 +213,19 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
+                    Text(
+                      'Thông tin liên lạc',
+                      style: kLabelSize15Blackw600,
+                    ),
+                    const SizedBox(height: 2),
+                    Text('Tên: ${adminUser!.name}', style: kLableSize13Grey),
+                    Text('Email: ${adminUser!.email}', style: kLableSize13Grey),
+                    Text('Số điện thoại: ${adminUser!.phoneNumber}',
+                        style: kLableSize13Grey),
                     if ({'Quyên góp tiền'}.contains(community.type))
                       Column(
                         children: [
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
