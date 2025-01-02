@@ -1,5 +1,5 @@
 class NotificationModel {
-  final String notificationId;
+  final int notificationId;
   final String? title;
   final String? content;
   final int userId;
@@ -12,6 +12,7 @@ class NotificationModel {
   final String? userName;
   final String? avatarUrl;
   final String? imageUrl;
+  late String? timeAgo;
 
   NotificationModel(
       {required this.notificationId,
@@ -38,7 +39,7 @@ class NotificationModel {
       createdAt: DateTime.parse(json['createdAt']),
       isRead: json['isRead'],
       type: json['type'],
-      communityId: json['communityId'],
+      communityId: json['comunityId'],
       postId: json['postId'],
       userName: json['userName'],
       avatarUrl: json['avatarUrl'],

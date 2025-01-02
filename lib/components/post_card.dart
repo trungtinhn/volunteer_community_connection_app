@@ -71,13 +71,26 @@ class _PostCardState extends State<PostCard> {
                                 )
                               : const Text(''),
                           widget.showCommunity
-                              ? Text(
-                                  '${widget.post.communityName}',
-                                  style: kLableSize15Bluew600,
+                              ? Expanded(
+                                  child: Text(
+                                    '${widget.post.communityName}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: kLableSize15Bluew600,
+                                  ),
                                 )
                               : const Text('')
                         ],
                       ),
+                      if (!widget.showCommunity)
+                        Text(
+                            widget.post.type == 1
+                                ? 'Quản trị viên'
+                                : widget.post.type == 2
+                                    ? 'Chủ dự án'
+                                    : widget.post.type == 3
+                                        ? 'Người đóng góp'
+                                        : '',
+                            style: kLableSize13Grey),
                       Text(widget.post.timeAgo!, style: kLableSize13Grey),
                     ],
                   ),

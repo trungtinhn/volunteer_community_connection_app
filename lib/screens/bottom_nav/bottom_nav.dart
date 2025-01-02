@@ -47,7 +47,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
         navKey: notificationKey,
       ),
       NavModel(
-        page: AccountScreen(user: _usercontroller.getCurrentUser()!),
+        page:
+            Obx(() => AccountScreen(user: _usercontroller.currentUser.value!)),
         navKey: accountKey,
       ),
     ];

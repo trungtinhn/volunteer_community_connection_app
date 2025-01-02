@@ -25,6 +25,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   File? selectedImage;
   String title = '';
   String content = '';
+  bool _isLoading = false;
 
   final Usercontroller _usercontroller = Get.put(Usercontroller());
   final PostController _postController = Get.put(PostController());
@@ -46,18 +47,35 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     };
 
     try {
+      setState(() {
+        _isLoading = true;
+      });
       var result = await _postController.createPost(postData, selectedImage);
+
+      setState(() {
+        _isLoading = false;
+      });
       if (result != null) {
-        _showMessage('Tạo bài đăng thanh cong', isSuccess: true);
-        await _postController.getPostsByCommunity(widget.community.communityId,
-            _usercontroller.getCurrentUser()!.userId);
+        _showMessage('Tạo bài đăng thành công', isSuccess: true);
+        _postController.loadedPosts.value =
+            await _postController.getPostsByCommunity(
+                widget.community.communityId,
+                _usercontroller.getCurrentUser()!.userId);
         await createNotification(result);
+        _usercontroller.setCurrentUser(await _usercontroller
+            .getUser(_usercontroller.getCurrentUser()!.userId));
         Get.back();
       } else {
-        _showMessage('Tạo bài đăng that bai', isSuccess: false);
+        setState(() {
+          _isLoading = false;
+        });
+        _showMessage('Tạo bài đăng thất bại', isSuccess: false);
       }
     } catch (e) {
-      _showMessage('Tạo bài đăng that bai', isSuccess: false);
+      setState(() {
+        _isLoading = false;
+      });
+      _showMessage('Tạo bài đăng thất bại', isSuccess: false);
     }
   }
 
@@ -66,13 +84,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return;
     }
 
-    final Map<String, String> notificationData = {
+    final Map<String, dynamic> notificationData = {
       'content': 'Đã đăng bài tại',
       'title': widget.community.communityName,
       'userId': widget.community.adminId.toString(),
       'senderId': _usercontroller.getCurrentUser()!.userId.toString(),
       'createdAt': DateTime.now().toIso8601String(),
-      'isRead': false.toString(),
+      'isRead': false,
       'type': 'POST',
       'communityId': widget.community.communityId.toString(),
       'postId': post.postId.toString(),
@@ -111,75 +129,79 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/image_sample.png'),
-                      fit: BoxFit.cover,
-                    ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: _usercontroller
+                                .currentUser.value!.avatarUrl !=
+                            null
+                        ? NetworkImage(
+                            _usercontroller.currentUser.value!.avatarUrl!)
+                        : const AssetImage('assets/images/default_avatar.jpg')
+                            as ImageProvider<Object>,
+                    radius: 25,
                   ),
-                ),
-                const SizedBox(width: 10),
-                Text('Nguyễn Trung Tính', style: kLableSize15Black),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                InputText(
-                  label: 'Chủ đề',
-                  name: '',
-                  hinttext: 'Vui lòng nhập chủ đề',
-                  isRequired: true,
-                  onChanged: (value) {
-                    title = value;
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                InputText(
-                  label: 'Cảm nghĩ của bạn',
-                  name: '',
-                  hinttext: 'Vui lòng nhập cảm nghĩ',
-                  isRequired: true,
-                  onChanged: (value) {
-                    content = value;
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                InputImage(
-                  label: 'Ảnh minh họa',
-                  required: false,
-                  onImagePicked: (File? image) {
-                    selectedImage = image;
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 100,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ButtonBlue(
-                  des: 'Tạo bài đăng', onPress: () => {_createPost()}),
-            )
-          ],
+                  const SizedBox(width: 10),
+                  Text(_usercontroller.currentUser.value!.name,
+                      style: kLableSize15Black),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  InputText(
+                    label: 'Chủ đề',
+                    name: '',
+                    hinttext: 'Vui lòng nhập chủ đề',
+                    isRequired: true,
+                    onChanged: (value) {
+                      title = value;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  InputText(
+                    label: 'Cảm nghĩ của bạn',
+                    name: '',
+                    hinttext: 'Vui lòng nhập cảm nghĩ',
+                    isRequired: true,
+                    onChanged: (value) {
+                      content = value;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  InputImage(
+                    label: 'Ảnh minh họa',
+                    required: false,
+                    onImagePicked: (File? image) {
+                      selectedImage = image;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 100,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ButtonBlue(
+                    isLoading: _isLoading,
+                    des: 'Tạo bài đăng',
+                    onPress: () => {_createPost()}),
+              )
+            ],
+          ),
         ),
       ),
     );
