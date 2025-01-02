@@ -38,8 +38,10 @@ class ChatService {
   }
 
   Future<void> sendMessage(int senderId, int receiverId, String content) async {
+    var sentAt = DateTime.now().toIso8601String();
+
     await hubConnection
-        .invoke('SendMessage', args: [senderId, receiverId, content]);
+        .invoke('SendMessage', args: [senderId, receiverId, content, sentAt]);
   }
 
   Future<void> sendMessageWithImage(

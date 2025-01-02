@@ -33,4 +33,8 @@ class MessageController extends GetxController {
   Future<List<Message>> getChat(int idUser, int otherIdUser) async {
     return await _messageRepository.getChat(idUser, otherIdUser);
   }
+
+  Future<void> sendMessage(Map<String, dynamic> data) async {
+    await _messageRepository.sendMessage(data);
+  }
 }

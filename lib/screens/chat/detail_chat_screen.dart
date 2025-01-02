@@ -71,12 +71,24 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
 
   Future<void> _sendMessage(String message) async {
     if (_selectedImage == null) {
-      await _chatService.sendMessage(
-          _usercontroller.getCurrentUser()!.userId,
-          widget.message.senderId == _usercontroller.getCurrentUser()!.userId
-              ? widget.message.receiverId
-              : widget.message.senderId,
-          message);
+      // await _chatService.sendMessage(
+      //     _usercontroller.getCurrentUser()!.userId,
+      //     widget.message.senderId == _usercontroller.getCurrentUser()!.userId
+      //         ? widget.message.receiverId
+      //         : widget.message.senderId,
+      //     message);
+
+      var dataMessage = {
+        'senderId': _usercontroller.getCurrentUser()!.userId,
+        'receiverId':
+            widget.message.senderId == _usercontroller.getCurrentUser()!.userId
+                ? widget.message.receiverId
+                : widget.message.senderId,
+        'content': message,
+        'sentAt': DateTime.now().toIso8601String()
+      };
+      await _messageController.sendMessage(dataMessage);
+      _getChat();
     } else {
       await _chatService.sendMessageWithImage(
         _usercontroller.getCurrentUser()!.userId,
@@ -88,8 +100,6 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
 
       _selectedImage = null;
     }
-
-    _getChat();
   }
 
   Future<void> _getChat() async {
@@ -158,18 +168,6 @@ class _DetailChatScreenState extends State<DetailChatScreen> {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
-                // if (message.containsKey('imageUrl')) {
-                //   return _buildMessageImage(
-                //     avatar: !message['isMe'],
-                //     imageUrl: message['imageUrl'],
-                //   );
-                // } else {
-                //   return _buildMessageBubble(
-                //     avatar: !message['isMe'],
-                //     message: message['message'],
-                //     isMe: message['isMe'],
-                //   );
-                // }
 
                 if (message.imageUrl != null) {
                   return _buildMessageImage(
