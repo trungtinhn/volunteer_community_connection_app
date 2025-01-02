@@ -24,14 +24,10 @@ class PostRepository {
     return Post.fromJson(data);
   }
 
-  Future<bool> createPost(Map<String, String> postData, File? image) async {
+  Future<Post> createPost(Map<String, String> postData, File? image) async {
     var result =
         await _apiService.createFormDataWithImage('/api/Post', postData, image);
 
-    if (result != null) {
-      return true;
-    } else {
-      return false;
-    }
+    return Post.fromJson(result);
   }
 }
