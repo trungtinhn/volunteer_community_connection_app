@@ -55,31 +55,44 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          InkWell(
+                  Flexible(
+                    // Giới hạn chiều rộng của Column
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            InkWell(
                               onTap: widget.onTapViewAccount,
-                              child: Text(widget.post.userName,
-                                  style: kLableSize15Black)),
-                          widget.showCommunity
-                              ? const Icon(
-                                  Icons.arrow_right,
-                                  color: AppColors.buleJeans,
-                                )
-                              : const Text(''),
-                          widget.showCommunity
-                              ? Text(
-                                  '${widget.post.communityName}',
+                              child: Text(
+                                widget.post.userName,
+                                style: kLableSize15Black,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (widget.showCommunity) ...[
+                              const Icon(
+                                Icons.arrow_right,
+                                color: AppColors.buleJeans,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  widget.post.communityName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: kLableSize15Bluew600,
-                                )
-                              : const Text('')
-                        ],
-                      ),
-                      Text(widget.post.timeAgo!, style: kLableSize13Grey),
-                    ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        Text(
+                          widget.post.timeAgo ?? '',
+                          style: kLableSize13Grey,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
