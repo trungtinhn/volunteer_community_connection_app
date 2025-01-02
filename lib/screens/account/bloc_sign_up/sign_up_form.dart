@@ -45,7 +45,7 @@ class _SignUpFormState extends State<SignUpForm> {
       context: context,
       initialDate: dayOfBirth,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(2030),
     );
     if (picked != null && picked != dayOfBirth) {
       setState(() {
@@ -106,8 +106,14 @@ class _SignUpFormState extends State<SignUpForm> {
             avatarUrl: '',
             countDonate: 0,
             countPosts: 0);
+        setState(() {
+          _isLoading = true;
+        });
         var result =
             await _authcontroller.register(user, passwordController.text);
+        setState(() {
+          _isLoading = false;
+        });
         if (result) {
           _showSnackBar('Sign Up successful');
           Navigator.pop(context);
