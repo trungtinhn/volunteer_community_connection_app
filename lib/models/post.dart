@@ -13,21 +13,24 @@ class Post {
   final String communityName;
   final bool isLiked;
   late String? timeAgo;
+  final int type;
 
-  Post(
-      {required this.postId,
-      required this.title,
-      required this.content,
-      required this.userId,
-      required this.communityID,
-      required this.createDate,
-      required this.imageUrl,
-      required this.likeCount,
-      required this.commentCount,
-      required this.userName,
-      required this.avatarUrl,
-      required this.communityName,
-      required this.isLiked});
+  Post({
+    required this.postId,
+    required this.title,
+    required this.content,
+    required this.userId,
+    required this.communityID,
+    required this.createDate,
+    required this.imageUrl,
+    required this.likeCount,
+    required this.commentCount,
+    required this.userName,
+    required this.avatarUrl,
+    required this.communityName,
+    required this.isLiked,
+    required this.type,
+  });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
@@ -42,8 +45,9 @@ class Post {
       commentCount: json['commentCount'],
       userName: json['userName'],
       avatarUrl: json['avatarUrl'],
-      communityName: json['communityName'],
+      communityName: json['communityName'] ?? '',
       isLiked: json['isLiked'],
+      type: json['type'],
     );
   }
 
@@ -62,6 +66,7 @@ class Post {
       'userName': userName,
       'avatarUrl': avatarUrl,
       'communityName': communityName,
+      'type': type
     };
   }
 }

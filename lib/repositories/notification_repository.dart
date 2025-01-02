@@ -6,7 +6,7 @@ class NotificationRepository {
   final ApiService _apiService = ApiService();
 
   Future<List<NotificationModel>> getNotifications(int userId) async {
-    final data = await _apiService.getAll('/api/Notification/$userId/');
+    final data = await _apiService.getAll('/api/Notification/$userId');
     return data.map((e) => NotificationModel.fromJson(e)).toList();
   }
 

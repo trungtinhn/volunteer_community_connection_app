@@ -71,8 +71,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationController _notificationController =
       Get.put(NotificationController());
 
-  List<NotificationModel> loadedNotifications = [];
-
   Future<void> _initNotificationService() async {
     await _notificationService
         .initConnection(_usercontroller.getCurrentUser()!.userId);
@@ -86,8 +84,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<void> _getNotifications() async {
-    loadedNotifications = await _notificationController
-        .getNotifications(_usercontroller.getCurrentUser()!.userId);
+    _notificationController.loadedNotifications.value =
+        await _notificationController
+            .getNotifications(_usercontroller.getCurrentUser()!.userId);
 
     setState(() {});
   }
@@ -110,24 +109,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
           centerTitle: true,
         ),
-        body: ListView.builder(
-            itemCount: loadedNotifications.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              final notification = loadedNotifications[index];
+        body: Obx(() {
+          return ListView.builder(
+              itemCount: _notificationController.loadedNotifications.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final notification =
+                    _notificationController.loadedNotifications[index];
 
-              if (notification.type == 'POST') {
-                return NotificationItem(
-                  avatarUrl: notification.avatarUrl!,
-                  name: notification.userName!,
-                  timeAgo: '1 giờ trước',
-                  content: notification.content!,
-                  linkText: notification.title!,
-                  postImageUrl: notification.imageUrl!,
-                  onTap: () {},
-                );
-              }
-              return SizedBox();
-            }));
+                if (notification.type == 'POST') {
+                  return NotificationItem(
+                    avatarUrl: notification.avatarUrl!,
+                    name: notification.userName!,
+                    timeAgo: notification.timeAgo!,
+                    content: notification.content!,
+                    linkText: notification.title!,
+                    postImageUrl: notification.imageUrl!,
+                    onTap: () {},
+                  );
+                }
+                return SizedBox();
+              });
+        }));
   }
 }

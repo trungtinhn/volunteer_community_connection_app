@@ -64,6 +64,7 @@ class _PostCardState extends State<PostCard> {
                           children: [
                             InkWell(
                               onTap: widget.onTapViewAccount,
+
                               child: Text(
                                 widget.post.userName,
                                 style: kLableSize15Black,
@@ -87,6 +88,16 @@ class _PostCardState extends State<PostCard> {
                             ],
                           ],
                         ),
+                   if (!widget.showCommunity)
+                        Text(
+                            widget.post.type == 1
+                                ? 'Quản trị viên'
+                                : widget.post.type == 2
+                                    ? 'Chủ dự án'
+                                    : widget.post.type == 3
+                                        ? 'Người đóng góp'
+                                        : '',
+                            style: kLableSize13Grey),
                         Text(
                           widget.post.timeAgo ?? '',
                           style: kLableSize13Grey,

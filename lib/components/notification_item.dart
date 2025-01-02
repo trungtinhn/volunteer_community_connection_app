@@ -70,6 +70,7 @@ class NotificationItem extends StatelessWidget {
                         ),
                         children: [
                           TextSpan(text: content, style: kLableSize15Black),
+                          TextSpan(text: ' ', style: kLableSize15Black),
                           TextSpan(text: linkText, style: kLableSize15Bluew600),
                         ],
                       ),
