@@ -111,31 +111,45 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
                           radius: 25,
                         ),
                         const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(_selectedPost!.userName,
-                                style: kLableSize15Black),
-                            Text(_selectedPost!.timeAgo!,
-                                style: kLableSize13Grey),
-                          ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.arrow_right,
-                              color: AppColors.buleJeans,
-                            ),
-                            Text(
-                              _selectedPost!.communityName,
-                              style: kLableSize15Bluew600,
-                            )
-                          ],
+                        Flexible(
+                          // Giới hạn chiều rộng của phần còn lại
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _selectedPost!.userName,
+                                    style: kLableSize15Black,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_right,
+                                    color: AppColors.buleJeans,
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      _selectedPost!.communityName,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: kLableSize15Bluew600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                _selectedPost!.timeAgo!,
+                                style: kLableSize13Grey,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
