@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ],
                   ),
                   child: IconButton(
-                      icon: SvgPicture.asset('assets/svgs/send.svg'),
+                      icon: SvgPicture.asset('assets/svgs/log_out.svg'),
                       onPressed: () {
                         _logOut();
                       }),

@@ -5,8 +5,10 @@ import 'package:volunteer_community_connection_app/constants/app_styles.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/screens/chat/chat_screen.dart';
 import 'package:get/get.dart';
+import 'package:volunteer_community_connection_app/widgets/admin_community/community_rejected.dart';
 import 'package:volunteer_community_connection_app/widgets/admin_community/community_wait_accept.dart';
 import 'package:volunteer_community_connection_app/widgets/common_community/my_community_tab.dart';
+import 'package:volunteer_community_connection_app/widgets/user_community/my_community_rejected.dart';
 import 'package:volunteer_community_connection_app/widgets/user_community/my_community_wait_accept.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -26,7 +28,7 @@ class _CommunityScreenState extends State<CommunityScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.index != _selectedTabIndex) {
@@ -118,7 +120,8 @@ class _CommunityScreenState extends State<CommunityScreen>
                 dividerColor: Colors.white,
                 tabs: [
                   buildTab(0, 'Dự án của bạn', 2),
-                  buildTab(1, 'Đang chờ duyệt', 2),
+                  buildTab(1, 'Chờ duyệt', 2),
+                  buildTab(2, 'Bị từ chối', 2),
                 ],
               ),
             ),
@@ -129,6 +132,9 @@ class _CommunityScreenState extends State<CommunityScreen>
           userController.currentUser.value!.role == 'admin'
               ? const CommunityWaitAccept()
               : const MyCommunityWaitAcceptTab(),
+          userController.currentUser.value!.role == 'admin'
+              ? const CommunityRejected()
+              : const MyCommunityRejectedTab(),
         ]));
   }
 
@@ -142,7 +148,7 @@ class _CommunityScreenState extends State<CommunityScreen>
       },
       child: SizedBox(
         height: 36,
-        width: (type == 1 ? 103 : 140),
+        width: (type == 1 ? 103 : 150),
         child: Center(
           child: Text(
             text,

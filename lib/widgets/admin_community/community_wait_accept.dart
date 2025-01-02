@@ -25,11 +25,11 @@ class _CommunityWaitAcceptState extends State<CommunityWaitAccept> {
 
   // Hiển thị thông báo
   void _showMessage(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-      ),
+    Get.snackbar(
+      'Thông báo',
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
     );
   }
 
@@ -84,7 +84,16 @@ class _CommunityWaitAcceptState extends State<CommunityWaitAccept> {
                   _showMessage('Duyệt dự án thất bại.', isSuccess: false);
                 }
               },
-              onDeny: () {},
+              onDeny: () async {
+                var result =
+                    await communityController.rejectCommunity(data.communityId);
+                if (result) {
+                  _showMessage('Từ chối dự án thành công.', isSuccess: true);
+                  communityController.getCommunitiesNoPublic();
+                } else {
+                  _showMessage('Từ chối dự án thất bại.', isSuccess: false);
+                }
+              },
             ),
           );
         },

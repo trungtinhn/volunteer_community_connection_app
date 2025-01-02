@@ -67,15 +67,15 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
       _showMessage('Vui lòng tải lên ảnh minh họa.');
       return;
     }
-    bool isPublished = false;
+    int isPublished = 0;
 
-    if (userController.currentUser.value!.role == 'admin') isPublished = true;
+    if (userController.currentUser.value!.role == 'admin') isPublished = 1;
 
     // Chuẩn bị dữ liệu dự án
     final Map<String, String> communityData = {
       "CommunityName": name,
       "Description": description,
-      "IsPublished": isPublished.toString(), // Mặc định là false
+      "publishStatus": isPublished.toString(), // Mặc định là false
       "AdminId": userController.currentUser.value!.userId.toString(),
       "CreateDate": DateTime.now().toIso8601String(),
       "StartDate": startDate.toIso8601String(),
@@ -104,11 +104,11 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
     setState(() {
       isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-      ),
+    Get.snackbar(
+      'Tạo dự án',
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
     );
     if (isSuccess) {
       Future.delayed(const Duration(seconds: 2), () {

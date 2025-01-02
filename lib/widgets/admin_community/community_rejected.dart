@@ -1,65 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:volunteer_community_connection_app/components/donation_card.dart';
 import 'package:volunteer_community_connection_app/components/donation_card_wait_accept.dart';
 import 'package:volunteer_community_connection_app/controllers/community_controller.dart';
 import 'package:volunteer_community_connection_app/controllers/user_controller.dart';
 import 'package:volunteer_community_connection_app/helpers/util.dart';
 import 'package:volunteer_community_connection_app/screens/donate/details_donation_screen.dart';
 
-class MyCommunityWaitAcceptTab extends StatefulWidget {
-  const MyCommunityWaitAcceptTab({super.key});
+class CommunityRejected extends StatefulWidget {
+  const CommunityRejected({super.key});
 
   @override
-  State<MyCommunityWaitAcceptTab> createState() =>
-      _MyCommunityWaitAcceptTabState();
+  State<CommunityRejected> createState() => _CommunityRejectedState();
 }
 
-class _MyCommunityWaitAcceptTabState extends State<MyCommunityWaitAcceptTab> {
+class _CommunityRejectedState extends State<CommunityRejected> {
   CommunityController communityController = Get.put(CommunityController());
-  Usercontroller userController = Get.put(Usercontroller());
+  Usercontroller user = Get.put(Usercontroller());
+
   @override
   void initState() {
     super.initState();
-    communityController
-        .getMyCommunitiesNoPublic(userController.currentUser.value!.userId);
+    communityController.getCommnitiesRejected();
   }
 
+  // Hiển thị thông báo
   void _showMessage(String message, {bool isSuccess = false}) {
-    Get.snackbar(
-      'Thông báo',
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: isSuccess ? Colors.green : Colors.red,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (communityController.myCommunitiesNoPublic.value == null) {
+      if (communityController.communitiesRejected.value == null) {
         return const Center(child: CircularProgressIndicator());
       }
 
-      if (communityController.myCommunitiesNoPublic.value!.isEmpty) {
+      if (communityController.communitiesRejected.value!.isEmpty) {
         return const Center(
-          child: Text('Hiện tại không có hoạt động nào đang chờ duyệt.'),
+          child: Text('Hiện tại không có hoạt động nào bị từ chối.'),
         );
       }
       return ListView.builder(
-        itemCount: communityController.myCommunitiesNoPublic.value!.length,
+        itemCount: communityController.communitiesRejected.value!.length,
         itemBuilder: (context, index) {
-          final data = communityController.myCommunitiesNoPublic.value![index];
+          final data = communityController.communitiesRejected.value![index];
           double progress = 0.0;
           if (data.targetAmount != null) {
             progress = data.currentAmount / data.targetAmount!;
           }
+
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: DonationCardWaitAccept(
-              status: data.checkStatus(),
+              status: 'Đã bị từ chối',
               title: data.communityName,
               type: data.type,
+              role: user.currentUser.value!.role,
               description: data.description,
               startDate: formatDate(data.startDate),
               endDate: formatDate(data.endDate),
@@ -73,19 +74,8 @@ class _MyCommunityWaitAcceptTabState extends State<MyCommunityWaitAcceptTab> {
                       communityId: data.communityId,
                     ));
               },
-              onAccept: () {},
-              onDeny: () async {
-                var result =
-                    await communityController.deleteCommunity(data.communityId);
-                if (result) {
-                  _showMessage('Hủy dự án thành công.', isSuccess: true);
-                  communityController.getMyCommunitiesNoPublic(
-                      userController.currentUser.value!.userId);
-                } else {
-                  _showMessage('Hủy dự án thất bại.');
-                }
-              },
-              role: userController.currentUser.value!.role,
+              onAccept: () async {},
+              onDeny: () {},
             ),
           );
         },

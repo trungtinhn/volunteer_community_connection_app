@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:volunteer_community_connection_app/components/button_light_gray.dart';
 import 'package:volunteer_community_connection_app/screens/account/login_screen.dart';
 
@@ -50,10 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: ButtonLightGray(
                   des: 'GET STARTED',
                   onPress: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
+                    Get.to(() => const LoginScreen());
                   }),
             )
           ]),

@@ -36,6 +36,11 @@ class CommunityRepository {
     return List<Community>.from(data.map((e) => Community.fromJson(e)));
   }
 
+  Future<List<Community>> getCommnitiesRejected() async {
+    final data = await _apiService.getAll('/api/Community/Rejected');
+    return List<Community>.from(data.map((e) => Community.fromJson(e)));
+  }
+
   Future<Map<String, dynamic>> createCommunityWithImage(
       Map<String, String> communityData, File? image) async {
     return await _apiService.createFormDataWithImage(
@@ -68,6 +73,31 @@ class CommunityRepository {
   Future<bool> unpublishCommunity(int id) async {
     try {
       await _apiService.put('/api/Community/$id/unpublish', {});
+      return true; // Thành công
+    } catch (e) {
+      return false; // Thất bại
+    }
+  }
+
+  Future<bool> rejectCommunity(int id) async {
+    try {
+      await _apiService.put('/api/Community/$id/reject', {});
+      return true; // Thành công
+    } catch (e) {
+      return false; // Thất bại
+    }
+  }
+
+  Future<List<Community>> getCommunitiesByAdminIdReject(int adminId) async {
+    final data = await _apiService
+        .getAll('/api/Community/$adminId/get-community-byAdminId-rejected');
+    return List<Community>.from(data.map((e) => Community.fromJson(e)))
+        .toList();
+  }
+
+  Future<bool> deleteCommunity(int id) async {
+    try {
+      await _apiService.delete('/api/Community/$id');
       return true; // Thành công
     } catch (e) {
       return false; // Thất bại
