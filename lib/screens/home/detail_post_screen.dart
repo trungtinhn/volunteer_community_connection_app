@@ -75,6 +75,7 @@ class _DetailPostScreenState extends State<DetailPostScreen> {
           postId, _usercontroller.getCurrentUser()!.userId);
       await _postController.updateLoadedPosts(post);
 
+      _postController.updateLoadedPosts(post);
       _selectedPost = post;
       setState(() {});
     }

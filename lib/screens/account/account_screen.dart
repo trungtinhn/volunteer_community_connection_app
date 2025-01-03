@@ -12,7 +12,9 @@ import 'package:volunteer_community_connection_app/controllers/user_controller.d
 import 'package:volunteer_community_connection_app/models/user.dart';
 import 'package:volunteer_community_connection_app/screens/home/detail_post_screen.dart';
 
+import '../../models/message.dart';
 import '../../models/post.dart';
+import '../chat/detail_chat_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   final User user;
@@ -192,7 +194,22 @@ class _AccountScreenState extends State<AccountScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildActionButton(Icons.email, Colors.blue),
+                    _buildActionButton(Icons.email, Colors.blue, () {
+                      var message = Message(
+                        senderId: _usercontroller.getCurrentUser()!.userId,
+                        receiverId: _selectedUser!.userId,
+                        content: '',
+                        sentAt: DateTime.now(),
+                        isRead: false,
+                        id: 0,
+                        unreadCount: 0,
+                        userName: _selectedUser!.name,
+                        avatarUrl: _selectedUser!.avatarUrl ?? '',
+                        imageUrl: '',
+                      );
+
+                      Get.to(() => DetailChatScreen(message: message));
+                    }),
                   ],
                 ),
               ListView.builder(
@@ -250,17 +267,20 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   // Hàm xây dựng nút hành động
-  Widget _buildActionButton(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 30,
+  Widget _buildActionButton(IconData icon, Color color, VoidCallback? onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          color: color,
+          size: 30,
+        ),
       ),
     );
   }

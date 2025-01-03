@@ -22,4 +22,10 @@ class MessageRepository {
 
     return List<Message>.from(data.map((e) => Message.fromJson(e))).toList();
   }
+
+  Future<Map<String, dynamic>> sendMessage(Map<String, dynamic> data) async {
+    var result = await _apiService.post('/api/Message', data);
+
+    return result;
+  }
 }
