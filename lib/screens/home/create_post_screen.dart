@@ -12,6 +12,7 @@ import 'package:volunteer_community_connection_app/models/post.dart';
 import '../../components/button_blue.dart';
 import '../../components/input_image.dart';
 import '../../controllers/user_controller.dart';
+import '../bottom_nav/bottom_nav.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final Community community;
@@ -64,7 +65,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         await createNotification(result);
         _usercontroller.setCurrentUser(await _usercontroller
             .getUser(_usercontroller.getCurrentUser()!.userId));
-        Get.back();
+        Get.to(() => const BottomNavigation());
       } else {
         setState(() {
           _isLoading = false;
