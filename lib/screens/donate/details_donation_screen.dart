@@ -287,12 +287,7 @@ class _DetailsDonationScreenState extends State<DetailsDonationScreen>
                       ButtonBlue(
                           des: 'Quyên góp ngay',
                           onPress: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DonationScreen(),
-                              ),
-                            );
+                            Get.to(const DonationScreen());
                           }),
                   ],
                 ),

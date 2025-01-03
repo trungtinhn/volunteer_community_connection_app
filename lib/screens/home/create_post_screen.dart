@@ -106,12 +106,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return false;
   }
 
+// Hiển thị thông báo
   void _showMessage(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-      ),
+    Get.snackbar(
+      'Tạo dự án',
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
     );
   }
 

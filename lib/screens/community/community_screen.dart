@@ -119,7 +119,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                 labelStyle: kLableSize15BlueDark,
                 dividerColor: Colors.white,
                 tabs: [
-                  buildTab(0, 'Dự án của bạn', 2),
+                  buildTab(0, 'Dự án', 2),
                   buildTab(1, 'Chờ duyệt', 2),
                   buildTab(2, 'Bị từ chối', 2),
                 ],
