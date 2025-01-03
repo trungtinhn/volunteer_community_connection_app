@@ -43,7 +43,7 @@ class Post {
       imageUrl: json['imageUrl'],
       likeCount: json['likeCount'],
       commentCount: json['commentCount'],
-      userName: json['userName'],
+      userName: json['userName'] ?? "",
       avatarUrl: json['avatarUrl'],
       communityName: json['communityName'] ?? '',
       isLiked: json['isLiked'],
