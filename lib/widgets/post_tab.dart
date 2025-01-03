@@ -57,6 +57,8 @@ class PostTabState extends State<PostTab> {
       var post = await _postController.getPost(
           postId, _usercontroller.getCurrentUser()!.userId);
       await _postController.updateLoadedPosts(post);
+
+      _postController.updateLoadedPosts(post);
     }
   }
 
